@@ -1,0 +1,210 @@
+{
+  "entities": {
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Public push notification or educational alert published by the platform admin.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Short notification title",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "body": {
+          "type": "string",
+          "description": "Full notification body message",
+          "minLength": 2,
+          "maxLength": 500
+        },
+        "tag": {
+          "type": "string",
+          "description": "Category tag (e.g., هام، المعلام، الفروض)",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "targetUrl": {
+          "type": "string",
+          "description": "Optional external link associated with the alert",
+          "maxLength": 300
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["normal", "strict"],
+          "maxLength": 20,
+          "description": "Alert severity level: normal or strict mandatory alert"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the admin author",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of publication"
+        }
+      },
+      "required": ["title", "body", "tag", "authorId", "createdAt"]
+    },
+    "PushSubscription": {
+      "title": "PushSubscription",
+      "description": "Registered FCM push token for a verified signed-in user device.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "fcmToken": {
+          "type": "string",
+          "description": "Firebase Cloud Messaging device registration token",
+          "minLength": 10,
+          "maxLength": 512
+        },
+        "platform": {
+          "type": "string",
+          "description": "Client platform summary",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "notificationsEnabled": {
+          "type": "boolean",
+          "description": "Whether push notifications are enabled on this device"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of subscription update"
+        }
+      },
+      "required": ["userId", "fcmToken", "platform", "notificationsEnabled", "updatedAt"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted administrator account lookup.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 120
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email", "role", "createdAt"]
+    },
+    "AdminEmailRecord": {
+      "title": "AdminEmailRecord",
+      "description": "Delegated administrator email managed exclusively by an existing admin.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 120,
+          "pattern": "^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$"
+        },
+        "addedBy": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email", "addedBy", "createdAt"]
+    },
+    "RegisteredStudent": {
+      "title": "RegisteredStudent",
+      "description": "Public non-PII directory entry for registered students showing name and active status.",
+      "type": "object",
+      "properties": {
+        "studentKey": {
+          "type": "string",
+          "description": "Opaque non-PII student identifier",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "minLength": 4,
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Student name added or updated in the app",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "levelBadge": {
+          "type": "string",
+          "description": "Optional study level label",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "isOnline": {
+          "type": "boolean",
+          "description": "Whether the student is currently active"
+        },
+        "lastActiveAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest activity"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of registration"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": ["studentKey", "displayName", "isOnline", "lastActiveAt", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/announcements/{announcementId}": {
+      "schema": {
+        "$ref": "#/entities/Announcement"
+      },
+      "description": "Broadcast educational alerts and push announcements."
+    },
+    "/registered_students/{studentId}": {
+      "schema": {
+        "$ref": "#/entities/RegisteredStudent"
+      },
+      "description": "Public non-PII directory of registered students and their live active/inactive status."
+    },
+    "/push_subscriptions/{subscriptionId}": {
+      "schema": {
+        "$ref": "#/entities/PushSubscription"
+      },
+      "description": "User FCM device tokens for push notifications."
+    },
+    "/admins/{adminId}": {
+      "schema": {
+        "$ref": "#/entities/AdminRecord"
+      },
+      "description": "Trusted administrator list."
+    },
+    "/admin_emails/{emailId}": {
+      "schema": {
+        "$ref": "#/entities/AdminEmailRecord"
+      },
+      "description": "Delegated administrator emails configurable only by admins."
+    }
+  }
+}

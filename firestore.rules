@@ -1,0 +1,176 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string
+        && id.size() > 0
+        && id.size() <= 128
+        && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidEmailDocId(id) {
+      return id is string
+        && id.size() >= 5
+        && id.size() <= 120
+        && id.matches('^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerified() && (
+        request.auth.token.email == 'ogemezur61@gmail.com'
+        || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        || (
+          request.auth.token.email is string
+          && exists(/databases/$(database)/documents/admin_emails/$(request.auth.token.email.lower()))
+        )
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidAnnouncement(data) {
+      return data.keys().hasAll(['title', 'body', 'tag', 'authorId', 'createdAt'])
+        && data.keys().hasOnly(['title', 'body', 'tag', 'targetUrl', 'priority', 'authorId', 'createdAt'])
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 140
+        && data.body is string && data.body.size() >= 2 && data.body.size() <= 500
+        && data.tag is string && data.tag.size() >= 1 && data.tag.size() <= 40
+        && (!('targetUrl' in data) || (data.targetUrl is string && data.targetUrl.size() <= 300))
+        && (!('priority' in data) || (data.priority is string && data.priority.size() <= 20 && data.priority in ['normal', 'strict']))
+        && data.authorId is string && isValidId(data.authorId)
+        && data.createdAt is timestamp;
+    }
+
+    function isValidPushSubscription(data) {
+      return data.keys().hasAll(['userId', 'fcmToken', 'platform', 'notificationsEnabled', 'updatedAt'])
+        && data.keys().hasOnly(['userId', 'fcmToken', 'platform', 'notificationsEnabled', 'updatedAt'])
+        && data.userId is string && isValidId(data.userId)
+        && data.fcmToken is string && data.fcmToken.size() >= 10 && data.fcmToken.size() <= 512
+        && data.platform is string && data.platform.size() >= 1 && data.platform.size() <= 64
+        && data.notificationsEnabled is bool
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAdminEmailRecord(data) {
+      return data.keys().hasAll(['email', 'addedBy', 'createdAt'])
+        && data.keys().hasOnly(['email', 'addedBy', 'createdAt'])
+        && data.email is string && isValidEmailDocId(data.email)
+        && data.addedBy is string && isValidId(data.addedBy)
+        && data.createdAt is timestamp;
+    }
+
+    function isValidRegisteredStudent(data) {
+      return data.keys().hasAll(['studentKey', 'displayName', 'isOnline', 'lastActiveAt', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['studentKey', 'displayName', 'levelBadge', 'isOnline', 'lastActiveAt', 'createdAt', 'updatedAt'])
+        && data.studentKey is string && data.studentKey.size() >= 4 && isValidId(data.studentKey)
+        && data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 80
+        && (!('levelBadge' in data) || (data.levelBadge is string && data.levelBadge.size() >= 1 && data.levelBadge.size() <= 40))
+        && data.isOnline is bool
+        && data.lastActiveAt is timestamp
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Public educational announcements (strictly non-PII)
+    match /announcements/{announcementId} {
+      allow get: if isValidId(announcementId);
+      allow list: if true;
+      allow create: if isAdmin()
+        && isValidId(announcementId)
+        && isValidAnnouncement(incoming())
+        && incoming().authorId == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(announcementId)
+        && isValidAnnouncement(incoming())
+        && incoming().authorId == existing().authorId
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'body', 'tag', 'targetUrl', 'priority']);
+      allow delete: if isAdmin() && isValidId(announcementId);
+    }
+
+    // Public non-PII registered students directory (no emails or PII stored)
+    match /registered_students/{studentId} {
+      allow get: if isValidId(studentId);
+      allow list: if true;
+      allow create: if isValidId(studentId)
+        && isValidRegisteredStudent(incoming())
+        && incoming().studentKey == studentId
+        && incoming().lastActiveAt == request.time
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(studentId)
+        && isValidRegisteredStudent(incoming())
+        && incoming().studentKey == existing().studentKey
+        && incoming().createdAt == existing().createdAt
+        && incoming().lastActiveAt == request.time
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'levelBadge', 'isOnline', 'lastActiveAt', 'updatedAt']);
+      allow delete: if isAdmin() && isValidId(studentId);
+    }
+
+    // User push notification subscriptions (owner-isolated & admin accessible)
+    match /push_subscriptions/{subscriptionId} {
+      allow get: if isValidId(subscriptionId) && (isOwner(subscriptionId) || isAdmin());
+      allow list: if isSignedIn() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isVerified()
+        && isValidId(subscriptionId)
+        && isOwner(subscriptionId)
+        && isValidPushSubscription(incoming())
+        && incoming().userId == request.auth.uid
+        && incoming().updatedAt == request.time;
+      allow update: if isVerified()
+        && isValidId(subscriptionId)
+        && isOwner(subscriptionId)
+        && isValidPushSubscription(incoming())
+        && incoming().userId == existing().userId
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['fcmToken', 'platform', 'notificationsEnabled', 'updatedAt']);
+      allow delete: if isValidId(subscriptionId) && (isOwner(subscriptionId) || isAdmin());
+    }
+
+    // Admin registry (immutable from client)
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && isOwner(adminId);
+      allow list, create, update, delete: if false;
+    }
+
+    // Delegated admin emails (modifiable exclusively by verified admins)
+    match /admin_emails/{emailId} {
+      allow get: if isVerified()
+        && isValidEmailDocId(emailId)
+        && (request.auth.token.email.lower() == emailId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        && isValidEmailDocId(emailId)
+        && isValidAdminEmailRecord(incoming())
+        && incoming().email == emailId
+        && incoming().addedBy == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if isAdmin() && isValidEmailDocId(emailId);
+    }
+  }
+}

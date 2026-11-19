@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4338ca"/>
+      <stop offset="55%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#brandGrad)"/>
+  <!-- Golden Spark -->
+  <path d="M256 76 L266 102 L294 104 L272 121 L279 148 L256 133 L233 148 L240 121 L218 104 L246 102 Z" fill="#FCD34D"/>
+  <!-- Graduation Cap -->
+  <polygon points="256,158 376,204 256,250 136,204" fill="#ffffff"/>
+  <path d="M188 228 L188 266 C188 266 222 290 256 290 C290 290 324 266 324 266 L324 228 L256 254 Z" fill="#ffffff" opacity="0.95"/>
+  <rect x="346" y="204" width="10" height="58" rx="5" fill="#ffffff"/>
+  <circle cx="351" cy="268" r="9" fill="#FCD34D"/>
+  <!-- Open Book -->
+  <path d="M140 282 C188 274 232 290 250 322 L250 404 C228 380 184 368 140 374 Z" fill="#ffffff"/>
+  <path d="M372 282 C324 274 280 290 262 322 L262 404 C284 380 328 368 372 374 Z" fill="#ffffff"/>
+  <path d="M124 300 L124 394 C178 386 228 400 256 426 C284 400 334 386 388 394 L388 300 L376 300 L376 380 C328 374 282 388 256 412 C230 388 184 374 136 380 L136 300 Z" fill="#ffffff" opacity="0.92"/>
+</svg>
