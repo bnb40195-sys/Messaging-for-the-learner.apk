@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-afac4cd2'], (function (workbox) { 'use strict';
+define(['./workbox-43e44e5a'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -87,7 +87,7 @@ define(['./workbox-afac4cd2'], (function (workbox) { 'use strict';
     "revision": "9546aaa0250f9e93b8ba75d536c7d8f3"
   }, {
     "url": "index.html",
-    "revision": "9e130ad86a6da0bd4f82ccaba5ccba8d"
+    "revision": "2da4ac43c89d606db1b1cb4be2986d83"
   }, {
     "url": "icon.svg",
     "revision": "1cc1fc8e8154c37228102725ae3e6cf0"
@@ -104,7 +104,7 @@ define(['./workbox-afac4cd2'], (function (workbox) { 'use strict';
     "url": "assets/index-DOkeGhGn.css",
     "revision": null
   }, {
-    "url": "assets/index-C271vgWM.js",
+    "url": "assets/index-C4Km6Qdd.js",
     "revision": null
   }, {
     "url": "assets/aistudio/pedag_psy_d43e3690.jpeg",
@@ -244,8 +244,9 @@ define(['./workbox-afac4cd2'], (function (workbox) { 'use strict';
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("/index.html"), {
-    denylist: [/^\/firebase-messaging-sw\.js$/]
+    denylist: [/^\/firebase-messaging-sw\.js$/, /^\/__\//]
   }));
+  workbox.registerRoute(/^https:\/\/(?:firestore|identitytoolkit|securetoken|firebase)\.googleapis\.com\/.*/i, new workbox.NetworkOnly(), 'GET');
   workbox.registerRoute(/^https:\/\/fonts\.googleapis\.com\/.*/i, new workbox.CacheFirst({
     "cacheName": "google-fonts-cache",
     plugins: [new workbox.ExpirationPlugin({

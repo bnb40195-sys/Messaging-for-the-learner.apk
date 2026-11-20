@@ -111,8 +111,12 @@ export default defineConfig(() => {
           globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2,json}'],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/],
+          navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/, /^\/__\//],
           runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/(?:firestore|identitytoolkit|securetoken|firebase)\.googleapis\.com\/.*/i,
+              handler: 'NetworkOnly',
+            },
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'CacheFirst',
