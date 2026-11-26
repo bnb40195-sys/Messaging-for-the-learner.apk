@@ -1,77 +1,104 @@
 import React, { useState } from 'react';
-import { 
-  ChevronLeft, Laptop, ExternalLink, AlertCircle, 
-  ZoomIn, X, CheckCircle2, Globe, Sparkles
-} from 'lucide-react';
-import { E_DEVOIR_SECONDARY, E_DEVOIR_MIDDLE, EDevoirLevel } from '../data/dirasaData';
+import { ChevronLeft, ExternalLink, AlertCircle, Pencil } from 'lucide-react';
+import { E_DEVOIR_SECONDARY, E_DEVOIR_MIDDLE } from '../data/dirasaData';
 import { SecondarySchoolIllustration, MiddleSchoolIllustration } from './Illustrations';
+import { sortItemsByOrder } from '../lib/customContent';
+import {
+  ButtonEditModal,
+  SectionAdminToolbar,
+  SectionCustomEntriesList,
+  SectionCustomizationContext,
+  SectionEntryModal,
+  SectionHeaderEditModal,
+  useSectionEditor,
+} from './SectionCustomEditor';
 
 interface HomeworkPageProps {
   onBack: () => void;
   onOpenSite: (url: string) => void;
+  onShowInfo?: (title: string, body: string) => void;
+  customization?: SectionCustomizationContext;
 }
 
-export const HomeworkPage: React.FC<HomeworkPageProps> = ({ onBack, onOpenSite }) => {
+export const HomeworkPage: React.FC<HomeworkPageProps> = ({
+  onBack,
+  onOpenSite,
+  onShowInfo,
+  customization,
+}) => {
   const [activeTab, setActiveTab] = useState<'secondary' | 'middle'>('secondary');
-  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
-
-  const secondaryScreenshot = '/assets/aistudio/Screenshot_2026-11-12-23-37-56-253_com.dirasam.dirasam1_eb954954.jpg';
-  const middleScreenshot = '/assets/aistudio/Screenshot_2026-11-12-23-37-50-103_com.dirasam.dirasam1_337c274b.jpg';
+  const editor = useSectionEditor(customization);
 
   const currentLevels = activeTab === 'secondary' ? E_DEVOIR_SECONDARY : E_DEVOIR_MIDDLE;
   const currentTitle = activeTab === 'secondary' ? 'المستوى الثانوي' : 'المستوى المتوسط';
-  const currentScreenshot = activeTab === 'secondary' ? secondaryScreenshot : middleScreenshot;
 
   return (
     <div className="min-h-full pb-16 flex flex-col items-center max-w-xl mx-auto">
-      {/* Top App Bar matching Screenshot header */}
+      {/* Top App Bar */}
       <div className="w-full flex items-center justify-between mb-4">
         <button
+          type="button"
           onClick={onBack}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors"
+          className="flex items-center justify-center w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           title="رجوع"
         >
           <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
         </button>
 
-        <h1 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-          <span>{currentTitle}</span>
-        </h1>
+        <div className="text-center">
+          <h1 className="text-xl font-black text-slate-900 dark:text-white">
+            <span>{editor.sectionHeader.title || currentTitle}</span>
+          </h1>
+          {editor.sectionHeader.subtitle && (
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+              {editor.sectionHeader.subtitle}
+            </p>
+          )}
+        </div>
 
-        <button
-          onClick={() => setZoomedImage(currentScreenshot)}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 shadow-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 transition-colors"
-          title="معاينة صورة الواجهة الأصلية"
-        >
-          <ZoomIn className="w-5 h-5" />
-        </button>
+        <div className="w-11" />
       </div>
 
-      {/* Level Switcher (ثانوي / متوسط) */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-indigo-100/60 dark:bg-slate-800/80 mb-4 border border-indigo-200/60 dark:border-slate-700 w-full max-w-md">
+      {/* Admin Customization Toolbar */}
+      <SectionAdminToolbar
+        isAdmin={editor.isAdmin}
+        isEditMode={editor.isEditMode}
+        hasOverrides={editor.hasOverrides}
+        onToggleEditMode={() => editor.setIsEditMode((v) => !v)}
+        onOpenAddEntry={(type) =>
+          editor.setEntryModal({ isOpen: true, initialType: type, editingEntry: null })
+        }
+        onEditSectionHeader={() => editor.setIsHeaderModalOpen(true)}
+        onResetSectionOverrides={() => customization?.onResetSectionOverrides()}
+      />
+
+      {/* Level Switcher */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white dark:bg-slate-900 mb-4 border border-slate-200 dark:border-slate-800 w-full max-w-md shadow-xs">
         <button
+          type="button"
           onClick={() => setActiveTab('secondary')}
-          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 min-h-[44px] py-2 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
             activeTab === 'secondary'
-              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-              : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <span>المستوى الثانوي (3)</span>
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('middle')}
-          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 min-h-[44px] py-2 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
             activeTab === 'middle'
-              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-              : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <span>المستوى المتوسط (4)</span>
         </button>
       </div>
 
-      {/* Top Vector Illustration matching the screenshots */}
+      {/* Top Vector Illustration */}
       <div className="my-2 transform hover:scale-105 transition-transform duration-300 flex justify-center">
         {activeTab === 'secondary' ? (
           <SecondarySchoolIllustration className="w-72 h-44 sm:w-80 sm:h-52" />
@@ -80,86 +107,133 @@ export const HomeworkPage: React.FC<HomeworkPageProps> = ({ onBack, onOpenSite }
         )}
       </div>
 
-      {/* Official Alert Box */}
-      <div className="w-full max-w-md p-3.5 mb-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-950 dark:text-indigo-200 leading-relaxed flex items-start gap-2.5">
-        <AlertCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+      {/* Official Info Box */}
+      <div className="w-full max-w-md p-3.5 mb-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 leading-relaxed flex items-start gap-2.5 shadow-xs">
+        <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
         <div>
-          <strong className="block mb-0.5 text-indigo-900 dark:text-indigo-300">
+          <strong className="block mb-0.5 text-slate-900 dark:text-white">
             مواقع الفرض الإلكتروني الرسمي ONEFD:
           </strong>
-          اضغط على السنة الدراسية للانتقال مباشرة إلى بوابة الفرض الخاصة بمستواك واحتساب نقطة المراقبة المستمرة.
+          <span className="whitespace-pre-line">
+            {editor.sectionHeader.note ||
+              'اضغط على السنة الدراسية للانتقال مباشرة إلى بوابة الفرض الخاصة بمستواك واحتساب نقطة المراقبة المستمرة.'}
+          </span>
         </div>
       </div>
 
-      {/* Pill Action Buttons styled exactly like screenshots */}
+      {/* Blue Action Buttons */}
       <div className="w-full max-w-md flex flex-col gap-3.5 mt-1">
-        {currentLevels.map((lvl) => (
-          <button
-            key={lvl.id}
-            onClick={() => onOpenSite(lvl.url)}
-            className="w-full h-16 px-6 rounded-full bg-gradient-to-r from-[#e3ddfe] via-[#d0c7fe] to-[#aba0fe] hover:from-[#dad2fe] hover:to-[#9f91fd] text-[#2d226b] font-black text-base sm:text-lg shadow-md shadow-indigo-500/10 flex items-center justify-between transition-all transform active:scale-[0.98] border border-white/70 dark:border-indigo-400/30 cursor-pointer group"
-          >
-            <div className="flex items-center gap-1.5 text-xs text-indigo-700 dark:text-indigo-900 font-bold opacity-80 group-hover:opacity-100">
-              <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">دخول ↗</span>
-            </div>
+        {sortItemsByOrder(currentLevels, (l) => l.id, editor.buttonOrder).map((lvl) => {
+          const ov = editor.overrides[lvl.id];
+          if (ov?.hidden && !(editor.isAdmin && editor.isEditMode)) {
+            return null;
+          }
+          const displayName = ov?.label || lvl.name;
 
-            <span className="text-base sm:text-lg tracking-wide">{lvl.name}</span>
+          const handleClick = () => {
+            if (ov?.actionType === 'text') {
+              onShowInfo?.(ov.textTitle || displayName, ov.textBody || '');
+            } else if (ov?.actionType === 'url' && ov.url) {
+              onOpenSite(ov.url);
+            } else {
+              onOpenSite(lvl.url);
+            }
+          };
 
-            <div className="w-9 h-9 rounded-xl bg-[#6754e2] text-white font-black text-base flex items-center justify-center shadow-xs">
-              {lvl.badgeNumber}
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Quick link to preview original screenshot */}
-      <div className="mt-5 text-center">
-        <button
-          onClick={() => setZoomedImage(currentScreenshot)}
-          className="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-slate-800"
-        >
-          <ZoomIn className="w-3.5 h-3.5" />
-          <span>معاينة صورة الواجهة الأصلية المرفقة (Screenshot) 🔍</span>
-        </button>
-      </div>
-
-      {/* Footer Notice matching screenshot */}
-      <div className="mt-auto pt-8 text-center">
-        <p className="text-xs text-slate-400">
-          إعلان
-        </p>
-      </div>
-
-      {/* Screenshot Zoom Modal */}
-      {zoomedImage && (
-        <div 
-          onClick={() => setZoomedImage(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/85 backdrop-blur-md animate-fadeIn"
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="relative max-w-sm max-h-[92vh] flex flex-col items-center bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-700 p-3"
-          >
-            <div className="w-full flex items-center justify-between pb-2 px-1 text-white text-xs font-bold">
-              <span>{activeTab === 'secondary' ? 'صورة المستوى الثانوي الأصلية' : 'صورة المستوى المتوسط الأصلية'}</span>
-              <button 
-                onClick={() => setZoomedImage(null)}
-                className="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center hover:bg-rose-600 transition-colors"
+          return (
+            <div key={lvl.id} className="space-y-1">
+              <button
+                type="button"
+                onClick={handleClick}
+                className={`w-full min-h-[64px] px-6 py-2.5 rounded-full bg-white dark:bg-slate-900 hover:bg-blue-50/70 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-black text-base sm:text-lg shadow-sm hover:shadow-md flex items-center justify-between transition-all active:scale-[0.98] border border-slate-200 dark:border-slate-800 cursor-pointer group ${
+                  ov?.hidden ? 'opacity-45' : ''
+                }`}
               >
-                <X className="w-4 h-4" />
+                <div className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 font-bold opacity-85 group-hover:opacity-100">
+                  <ExternalLink className="w-4 h-4" />
+                  <span className="hidden sm:inline">دخول</span>
+                </div>
+
+                <div className="text-center px-2 min-w-0">
+                  <span className="text-base sm:text-lg tracking-wide block truncate">
+                    {displayName}
+                  </span>
+                  {ov?.subtitle && (
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
+                      {ov.subtitle}
+                    </span>
+                  )}
+                </div>
+
+                <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black text-base flex items-center justify-center shadow-xs shrink-0">
+                  {lvl.badgeNumber}
+                </div>
               </button>
+
+              {editor.isAdmin && editor.isEditMode && (
+                <div className="flex justify-end px-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      editor.setEditingButton({
+                        id: lvl.id,
+                        defaultLabel: lvl.name,
+                        defaultSubtitle: '',
+                        defaultUrl: lvl.url,
+                      })
+                    }
+                    className="px-3 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-sky-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <Pencil className="w-3 h-3" />
+                    <span>تعديل هذا الزر</span>
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="overflow-auto max-h-[calc(92vh-50px)]">
-              <img 
-                src={zoomedImage} 
-                alt="Screenshot preview" 
-                className="w-full h-auto object-contain rounded-2xl"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+          );
+        })}
+      </div>
+
+      {/* Custom Websites & Texts Added to This Section */}
+      <SectionCustomEntriesList
+        entries={editor.entries}
+        isAdmin={editor.isAdmin}
+        isEditMode={editor.isEditMode}
+        onOpenSite={onOpenSite}
+        onShowInfo={onShowInfo}
+        onEditEntry={(entry) =>
+          editor.setEntryModal({ isOpen: true, initialType: entry.type, editingEntry: entry })
+        }
+        onDeleteEntry={(id) => customization?.onDeleteCustomEntry(id)}
+        onMoveEntry={(id, dir) => customization?.onMoveCustomEntry(id, dir)}
+      />
+
+      <ButtonEditModal
+        target={editor.editingButton}
+        currentOverride={editor.editingButton ? editor.overrides[editor.editingButton.id] : undefined}
+        onSave={(id, next) => customization?.onSaveButtonOverride(id, next)}
+        onReset={(id) => customization?.onResetButtonOverride(id)}
+        onClose={() => editor.setEditingButton(null)}
+      />
+
+      <SectionEntryModal
+        isOpen={editor.entryModal.isOpen}
+        initialType={editor.entryModal.initialType}
+        editingEntry={editor.entryModal.editingEntry}
+        onSave={(entry, editingId) => customization?.onSaveCustomEntry(entry, editingId)}
+        onClose={() => editor.setEntryModal((p) => ({ ...p, isOpen: false }))}
+      />
+
+      <SectionHeaderEditModal
+        isOpen={editor.isHeaderModalOpen}
+        current={editor.sectionHeader}
+        defaultTitle="الفرض الإلكتروني الرسمي"
+        defaultSubtitle=""
+        defaultNote="اضغط على السنة الدراسية للانتقال مباشرة إلى بوابة الفرض الخاصة بمستواك واحتساب نقطة المراقبة المستمرة."
+        onSave={(next) => customization?.onSaveSectionHeader?.(next)}
+        onReset={() => customization?.onResetSectionHeader?.()}
+        onClose={() => editor.setIsHeaderModalOpen(false)}
+      />
     </div>
   );
 };

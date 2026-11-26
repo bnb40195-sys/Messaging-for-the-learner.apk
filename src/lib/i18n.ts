@@ -6,10 +6,11 @@ export interface AppTranslations {
   menuTitle: string;
   closeMenu: string;
   settings: string;
+  appearanceTitle: string;
+  lightModeLabel: string;
+  darkModeLabel: string;
   languageTitle: string;
   languageDesc: string;
-  backgroundTitle: string;
-  backgroundDesc: string;
   themeTitle: string;
   applyAndClose: string;
   notifications: string;
@@ -41,11 +42,12 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslations> = {
     menuTitle: 'القائمة الرئيسية',
     closeMenu: 'إغلاق القائمة',
     settings: 'الإعدادات',
+    appearanceTitle: 'وضع العرض',
+    lightModeLabel: 'الوضع الفاتح',
+    darkModeLabel: 'الوضع الداكن',
     languageTitle: 'لغة التطبيق',
     languageDesc: 'اختر لغة العرض واتجاه الواجهة',
-    backgroundTitle: 'خلفية التطبيق',
-    backgroundDesc: 'اختر خلفية الشاشة الرئيسية والصفحات',
-    themeTitle: 'نمط الألوان والسمة',
+    themeTitle: 'ألوان التطبيق',
     applyAndClose: 'حفظ وتطبيق الإعدادات',
     notifications: 'الإشعارات',
     adminBadge: 'المشرف',
@@ -53,7 +55,7 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslations> = {
     heroCountry: 'الجمهورية الجزائرية الديمقراطية الشعبية · الديوان الوطني ONEFD',
     heroTitle: 'بوابة التعليم الرقمي والتقويمات الرسمية 2026/2027',
     heroSubtitle:
-      'المنصة الرسمية المعتمدة لمتابعة رزنامة التقويمات التكوينية، الفروض الإلكترونية، والأرضيات التعليمية داخل التطبيق.',
+      'المنصة الرقمية لمتابعة رزنامة التقويمات التكوينية، الفروض الإلكترونية، الأرضيات التعليمية، وبنك الأسئلة التفاعلية لجميع المستويات.',
     countdownTitle: 'العد التنازلي لامتحان إثبات المستوى دورة ماي 2027',
     countdownDesc: 'يتحدث العد التنازلي تلقائياً كل يوم حتى موعد الامتحان الرسمي',
     daysRemaining: 'يوماً متبقياً',
@@ -75,11 +77,12 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslations> = {
     menuTitle: 'Menu Principal',
     closeMenu: 'Fermer le menu',
     settings: 'Paramètres',
+    appearanceTitle: "Mode d'affichage",
+    lightModeLabel: 'Mode clair',
+    darkModeLabel: 'Mode sombre',
     languageTitle: "Langue de l'application",
     languageDesc: "Choisissez la langue d'affichage",
-    backgroundTitle: "Arrière-plan de l'application",
-    backgroundDesc: "Personnalisez le fond d'écran",
-    themeTitle: 'Thème et couleurs',
+    themeTitle: "Couleurs de l'application",
     applyAndClose: 'Enregistrer et appliquer',
     notifications: 'Notifications',
     adminBadge: 'Admin',
@@ -87,7 +90,7 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslations> = {
     heroCountry: 'République Algérienne · Office National ONEFD',
     heroTitle: "Portail d'Enseignement Numérique & Évaluations 2026/2027",
     heroSubtitle:
-      'Consultez le calendrier officiel, les devoirs et les plateformes pédagogiques directement dans application.',
+      'Consultez le calendrier officiel, les devoirs électroniques, la banque de questions et les plateformes pédagogiques.',
     countdownTitle: "Compte à rebours de l'examen de niveau Mai 2027",
     countdownDesc: "Mis à jour automatiquement chaque jour jusqu'à l'examen officiel",
     daysRemaining: 'jours restants',
@@ -109,11 +112,12 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslations> = {
     menuTitle: 'Main Menu',
     closeMenu: 'Close menu',
     settings: 'Settings',
+    appearanceTitle: 'Display Mode',
+    lightModeLabel: 'Light Mode',
+    darkModeLabel: 'Dark Mode',
     languageTitle: 'App Language',
     languageDesc: 'Choose display language and layout direction',
-    backgroundTitle: 'App Background',
-    backgroundDesc: 'Choose your preferred backdrop style',
-    themeTitle: 'Color Theme',
+    themeTitle: 'App Colors',
     applyAndClose: 'Save & Apply',
     notifications: 'Notifications',
     adminBadge: 'Admin',
@@ -121,7 +125,7 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslations> = {
     heroCountry: 'People’s Democratic Republic of Algeria · ONEFD',
     heroTitle: 'Digital Learning Portal & Official Assessments 2026/2027',
     heroSubtitle:
-      'Access assessment calendars, coursework, and digital learning platforms directly inside the app.',
+      'Access assessment calendars, e-homework portals, learning platforms, and interactive quiz banks across all levels.',
     countdownTitle: 'Countdown to May 2027 Level Exam',
     countdownDesc: 'Automatically updated daily until the official exam date',
     daysRemaining: 'days left',

@@ -77,7 +77,7 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
             {/* Browser chrome header */}
             <div className="flex items-center justify-between px-4 py-3 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-500 inline-block cursor-pointer" onClick={() => setInAppPreviewUrl(null)}></span>
+                <span className="w-3 h-3 rounded-full bg-red-500 inline-block cursor-pointer" onClick={() => setInAppPreviewUrl(null)}></span>
                 <span className="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
                 <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
               </div>
@@ -88,7 +88,7 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
                 <span className="truncate flex-1 text-left" dir="ltr">{inAppPreviewUrl}</span>
                 <button 
                   onClick={() => setInAppPreviewUrl(inAppPreviewUrl)}
-                  className="p-1 hover:text-indigo-600 transition-colors"
+                  className="p-1 hover:text-blue-600 transition-colors"
                   title="تحديث"
                 >
                   <RefreshCw className="w-3 h-3" />
@@ -98,7 +98,7 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleOpenExternal(inAppPreviewUrl)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                 >
                   <span>فتح في نافذة كاملة</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -115,7 +115,7 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
             {/* Browser body / Iframe fallback area */}
             <div className="flex-1 bg-slate-50 dark:bg-slate-950 relative flex flex-col items-center justify-center p-6 text-center">
               <div className="max-w-md p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <Globe className="w-8 h-8" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
@@ -127,15 +127,14 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
                 <div className="flex flex-col gap-2.5">
                   <button
                     onClick={() => handleOpenExternal(inAppPreviewUrl)}
-                    className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                    className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
                   >
                     <span>فتح الموقع داخل التطبيق</span>
                     <Globe className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(inAppPreviewUrl);
-                      alert('تم نسخ الرابط بنجاح!');
+                      navigator.clipboard?.writeText(inAppPreviewUrl).catch(() => {});
                     }}
                     className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
                   >
@@ -164,36 +163,36 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
               <svg viewBox="0 0 100 100" className="w-44 h-44">
                 <rect width="100" height="100" fill="#ffffff" />
                 {/* QR corners */}
-                <rect x="5" y="5" width="25" height="25" fill="#1e1b4b" rx="3" />
+                <rect x="5" y="5" width="25" height="25" fill="#0f172a" rx="3" />
                 <rect x="9" y="9" width="17" height="17" fill="#ffffff" rx="2" />
-                <rect x="13" y="13" width="9" height="9" fill="#1e1b4b" rx="1" />
+                <rect x="13" y="13" width="9" height="9" fill="#0f172a" rx="1" />
 
-                <rect x="70" y="5" width="25" height="25" fill="#1e1b4b" rx="3" />
+                <rect x="70" y="5" width="25" height="25" fill="#0f172a" rx="3" />
                 <rect x="74" y="9" width="17" height="17" fill="#ffffff" rx="2" />
-                <rect x="78" y="13" width="9" height="9" fill="#1e1b4b" rx="1" />
+                <rect x="78" y="13" width="9" height="9" fill="#0f172a" rx="1" />
 
-                <rect x="5" y="70" width="25" height="25" fill="#1e1b4b" rx="3" />
+                <rect x="5" y="70" width="25" height="25" fill="#0f172a" rx="3" />
                 <rect x="9" y="74" width="17" height="17" fill="#ffffff" rx="2" />
-                <rect x="13" y="78" width="9" height="9" fill="#1e1b4b" rx="1" />
+                <rect x="13" y="78" width="9" height="9" fill="#0f172a" rx="1" />
 
                 {/* Data dots */}
-                <rect x="36" y="8" width="6" height="6" fill="#4338ca" />
-                <rect x="46" y="8" width="6" height="12" fill="#4338ca" />
-                <rect x="56" y="12" width="8" height="6" fill="#4338ca" />
+                <rect x="36" y="8" width="6" height="6" fill="#2563eb" />
+                <rect x="46" y="8" width="6" height="12" fill="#2563eb" />
+                <rect x="56" y="12" width="8" height="6" fill="#2563eb" />
 
-                <rect x="8" y="36" width="6" height="6" fill="#4338ca" />
-                <rect x="20" y="44" width="12" height="6" fill="#4338ca" />
-                <rect x="36" y="36" width="10" height="10" fill="#1e1b4b" />
-                <rect x="52" y="36" width="8" height="8" fill="#4338ca" />
-                <rect x="68" y="36" width="12" height="8" fill="#1e1b4b" />
+                <rect x="8" y="36" width="6" height="6" fill="#2563eb" />
+                <rect x="20" y="44" width="12" height="6" fill="#2563eb" />
+                <rect x="36" y="36" width="10" height="10" fill="#0f172a" />
+                <rect x="52" y="36" width="8" height="8" fill="#2563eb" />
+                <rect x="68" y="36" width="12" height="8" fill="#0f172a" />
 
-                <rect x="36" y="54" width="14" height="6" fill="#4338ca" />
-                <rect x="56" y="54" width="8" height="14" fill="#1e1b4b" />
-                <rect x="72" y="54" width="14" height="6" fill="#4338ca" />
+                <rect x="36" y="54" width="14" height="6" fill="#2563eb" />
+                <rect x="56" y="54" width="8" height="14" fill="#0f172a" />
+                <rect x="72" y="54" width="14" height="6" fill="#2563eb" />
 
-                <rect x="36" y="72" width="8" height="16" fill="#1e1b4b" />
-                <rect x="50" y="78" width="16" height="8" fill="#4338ca" />
-                <rect x="74" y="72" width="16" height="16" fill="#1e1b4b" />
+                <rect x="36" y="72" width="8" height="16" fill="#0f172a" />
+                <rect x="50" y="78" width="16" height="8" fill="#2563eb" />
+                <rect x="74" y="72" width="16" height="16" fill="#0f172a" />
               </svg>
             </div>
             <p className="text-[11px] font-mono text-slate-500 truncate mb-5" dir="ltr">
@@ -216,20 +215,20 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="ابحث عن موقع (تسجيل، معلام، فرض، استدعاء، كشف نقاط)..."
-          className="w-full h-12 pr-11 pl-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+          className="w-full h-12 pr-11 pl-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
         />
         <Search className="w-5 h-5 text-slate-400 absolute right-4 top-3.5 pointer-events-none" />
       </div>
 
-      {/* Category Pills Filter */}
+      {/* Category Filter */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-6 no-scrollbar">
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
               selectedCategory === cat.id
-                ? 'bg-gradient-to-r from-[#7c6bee] to-[#6351e6] text-white shadow-md shadow-indigo-500/20'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50'
             }`}
           >
@@ -248,15 +247,15 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
               onClick={() => setActiveSite(site)}
               className={`p-5 rounded-3xl transition-all border cursor-pointer flex flex-col justify-between ${
                 isSelected
-                  ? 'bg-gradient-to-br from-white to-indigo-50/40 dark:from-slate-900 dark:to-indigo-950/20 border-indigo-300 dark:border-indigo-700 shadow-md ring-2 ring-indigo-500/20'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-200 shadow-sm'
+                  ? 'bg-gradient-to-br from-white to-blue-50/50 dark:from-slate-900 dark:to-blue-950/20 border-blue-400 dark:border-blue-700 shadow-md ring-2 ring-blue-500/20'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-300 shadow-sm'
               }`}
             >
               <div>
                 {/* Header row */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#7c6bee] to-[#4f3fc7] text-white flex items-center justify-center shadow-sm shrink-0">
+                    <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-sm shrink-0">
                       {site.iconType === 'link' && <Globe className="w-5 h-5" />}
                       {site.iconType === 'laptop' && <Laptop className="w-5 h-5" />}
                       {site.iconType === 'book' && <BookOpen className="w-5 h-5" />}
@@ -268,7 +267,7 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
                         {site.title}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                        <span className="text-[11px] font-medium text-blue-600 dark:text-blue-400">
                           {site.badge}
                         </span>
                         <span className="text-slate-300 dark:text-slate-700">·</span>
@@ -292,7 +291,7 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
                       e.stopPropagation();
                       handleCopy(site);
                     }}
-                    className="p-1 hover:text-indigo-600 transition-colors"
+                    className="p-1 hover:text-blue-600 transition-colors"
                     title="نسخ الرابط"
                   >
                     {copiedId === site.id ? (
@@ -311,10 +310,10 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
                     e.stopPropagation();
                     handleOpenExternal(site.url);
                   }}
-                  className="flex-1 h-10 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:opacity-95 text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-transform active:scale-[0.98]"
-                  title="فتح الموقع الرسمي في المتصفح الخارجي"
+                  className="flex-1 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-sky-600 hover:opacity-95 text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-transform active:scale-[0.98]"
+                  title="زيارة الموقع الرسمي"
                 >
-                  <span>فتح الموقع في المتصفح ↗</span>
+                  <span>زيارة الموقع الرسمي ↗</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </button>
 
@@ -338,15 +337,15 @@ export const WebsitesHubPage: React.FC<WebsitesHubPageProps> = ({ onBack, onOpen
       {activeSite && (
         <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <HelpCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <HelpCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">
               تعليمات الاستخدام وإرشادات الدخول إلى: {activeSite.title}
             </h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
             {activeSite.guidelines.map((guide, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 p-3 rounded-2xl bg-indigo-50/50 dark:bg-slate-950 border border-indigo-100/60 dark:border-slate-800">
-                <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+              <div key={idx} className="flex items-start gap-2.5 p-3 rounded-2xl bg-blue-50/50 dark:bg-slate-950 border border-blue-100 dark:border-slate-800">
+                <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                   {idx + 1}
                 </span>
                 <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">

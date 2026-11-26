@@ -2,10 +2,12 @@
 	"appId": "dz.onefd.platform",
 	"appName": "بوابة المتعلم",
 	"webDir": "dist",
+	"backgroundColor": "#F8FAFC",
 	"server": {
 		"androidScheme": "https"
 	},
 	"android": {
-		"allowMixedContent": true
+		"allowMixedContent": true,
+		"backgroundColor": "#F8FAFC"
 	}
 }

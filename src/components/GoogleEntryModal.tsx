@@ -40,11 +40,11 @@ type AuthStep = 'menu' | 'google-picker' | 'google-add' | 'password' | 'direct-l
 
 const AVATAR_COLORS = [
   'bg-emerald-600',
-  'bg-purple-600',
-  'bg-indigo-600',
+  'bg-blue-600',
+  'bg-teal-600',
   'bg-sky-600',
   'bg-amber-600',
-  'bg-rose-600',
+  'bg-red-600',
 ];
 
 function loadProfiles(): Record<string, string> {
@@ -380,7 +380,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
                 onSignOut();
                 onClose();
               }}
-              className="py-3 px-4 rounded-full bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              className="py-3 px-4 rounded-full bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
             >
               <LogOut className="w-4 h-4" />
               <span>تسجيل الخروج</span>
@@ -419,7 +419,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
               <img
                 src="/app-logo.png"
                 alt="شعار بوابة المتعلم"
-                className="w-16 h-16 rounded-2xl shadow-lg shadow-indigo-500/20 object-cover"
+                className="w-16 h-16 rounded-2xl shadow-lg shadow-blue-500/20 object-cover"
               />
               <div>
                 <h3 className="text-lg font-black text-white">بوابة المتعلم الرقمية</h3>
@@ -533,11 +533,11 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
                   onClick={handlePickNativePhoneAccount}
                   className="w-full px-5 py-3.5 hover:bg-white/5 flex items-center gap-3.5 text-right transition-colors cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-blue-500/20 text-sky-300 flex items-center justify-center shrink-0">
                     <Smartphone className="w-5 h-5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-bold text-indigo-200">
+                    <div className="text-sm font-bold text-sky-200">
                       اختيار من جميع حسابات الهاتف
                     </div>
                     <div className="text-[11px] text-slate-400">
@@ -594,7 +594,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-bold flex items-center gap-2">
+              <div className="p-3 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-200 text-xs font-bold flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
@@ -618,7 +618,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="name@gmail.com"
-                    className="w-full pr-10 pl-4 py-3 rounded-2xl bg-[#1e1f22] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-400 text-left"
+                    className="w-full pr-10 pl-4 py-3 rounded-2xl bg-[#1e1f22] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-400 text-left"
                   />
                 </div>
               </div>
@@ -634,13 +634,13 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
                   value={nameInput}
                   onChange={(e) => setNameInput(e.target.value)}
                   placeholder="مثال: أحمد"
-                  className="w-full px-4 py-3 rounded-2xl bg-[#1e1f22] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-400"
+                  className="w-full px-4 py-3 rounded-2xl bg-[#1e1f22] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-400"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 px-5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-colors cursor-pointer"
+                className="w-full py-3 px-5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-colors cursor-pointer"
               >
                 متابعة بالحساب
               </button>
@@ -670,7 +670,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-bold flex items-center gap-2">
+              <div className="p-3 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-200 text-xs font-bold flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
@@ -694,7 +694,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="name@gmail.com"
-                    className="w-full pr-10 pl-4 py-3 rounded-2xl bg-[#181a20] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-400 text-left"
+                    className="w-full pr-10 pl-4 py-3 rounded-2xl bg-[#181a20] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-400 text-left"
                   />
                 </div>
               </div>
@@ -715,7 +715,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
                     value={passwordInput}
                     onChange={(e) => setPasswordInput(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pr-10 pl-10 py-3 rounded-2xl bg-[#181a20] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-400 text-left"
+                    className="w-full pr-10 pl-10 py-3 rounded-2xl bg-[#181a20] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-400 text-left"
                   />
                   <button
                     type="button"
@@ -756,7 +756,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-bold flex items-center gap-2">
+              <div className="p-3 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-200 text-xs font-bold flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
@@ -780,7 +780,7 @@ export const GoogleEntryModal: React.FC<GoogleEntryModalProps> = ({
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="name@gmail.com"
-                    className="w-full pr-10 pl-4 py-3 rounded-2xl bg-[#181a20] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-400 text-left"
+                    className="w-full pr-10 pl-4 py-3 rounded-2xl bg-[#181a20] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-400 text-left"
                   />
                 </div>
               </div>

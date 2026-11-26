@@ -123,11 +123,18 @@ service cloud.firestore {
         && incoming().updatedAt == request.time;
       allow update: if isValidId(studentId)
         && isValidRegisteredStudent(incoming())
-        && incoming().studentKey == existing().studentKey
-        && incoming().createdAt == existing().createdAt
+        && incoming().studentKey == studentId
+        && (!('studentKey' in existing()) || incoming().studentKey == existing().studentKey)
+        && (!('createdAt' in existing())
+          ? incoming().createdAt == request.time
+          : incoming().createdAt == existing().createdAt)
         && incoming().lastActiveAt == request.time
         && incoming().updatedAt == request.time
-        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'levelBadge', 'isOnline', 'lastActiveAt', 'updatedAt']);
+        && incoming().diff(existing()).affectedKeys().hasOnly(
+          ('createdAt' in existing() && 'studentKey' in existing())
+            ? ['displayName', 'levelBadge', 'isOnline', 'lastActiveAt', 'updatedAt']
+            : ['studentKey', 'displayName', 'levelBadge', 'isOnline', 'lastActiveAt', 'updatedAt', 'createdAt']
+        );
       allow delete: if isAdmin() && isValidId(studentId);
     }
 

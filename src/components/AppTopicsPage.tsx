@@ -1,11 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import {
+  AlertCircle,
   BookOpen,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronUp,
   HelpCircle,
+  Pencil,
+  RefreshCw,
   RotateCcw,
   Search,
   XCircle,
@@ -13,52 +16,142 @@ import {
 import {
   AppSubjectTopic,
   getTopicsForSelection,
+  PracticeExercise,
+  RealQuizQuestion,
   TOPIC_LEVEL_DEFINITIONS,
   TopicLevelId,
 } from '../data/appTopicsBank';
 import { AppLanguage, TRANSLATIONS } from '../lib/i18n';
+import { sortItemsByOrder } from '../lib/customContent';
+import {
+  ButtonEditModal,
+  SectionAdminToolbar,
+  SectionCustomEntriesList,
+  SectionCustomizationContext,
+  SectionEntryModal,
+  SectionHeaderEditModal,
+  useSectionEditor,
+} from './SectionCustomEditor';
+
+function shuffleArray<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function shuffleQuizQuestions(questions: RealQuizQuestion[]): RealQuizQuestion[] {
+  return shuffleArray(questions).map((q) => {
+    const taggedOptions = q.options.map((text, idx) => ({
+      text,
+      isCorrect: idx === q.correctIndex,
+    }));
+    const mixedOptions = shuffleArray(taggedOptions);
+    const newCorrectIndex = mixedOptions.findIndex((o) => o.isCorrect);
+    return {
+      ...q,
+      options: mixedOptions.map((o) => o.text),
+      correctIndex: newCorrectIndex >= 0 ? newCorrectIndex : 0,
+    };
+  });
+}
 
 interface AppTopicsPageProps {
   language?: AppLanguage;
   onBack: () => void;
+  onOpenSite?: (url: string) => void;
+  onShowInfo?: (title: string, body: string) => void;
+  customization?: SectionCustomizationContext;
 }
 
-type TopicsStep = 'cycle' | 'level' | 'stream' | 'subjects' | 'topic';
+type TopicsStep = 'select' | 'subjects' | 'topic';
 
-export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', onBack }) => {
+interface ComboOption {
+  key: string;
+  levelId: TopicLevelId;
+  streamId: string;
+  label: string;
+}
+
+export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
+  language = 'ar',
+  onBack,
+  onOpenSite,
+  onShowInfo,
+  customization,
+}) => {
   const t = TRANSLATIONS[language];
+  const editor = useSectionEditor(customization);
 
-  const [step, setStep] = useState<TopicsStep>('cycle');
-  const [selectedCycle, setSelectedCycle] = useState<'middle' | 'secondary'>('secondary');
-  const [selectedLevelId, setSelectedLevelId] = useState<TopicLevelId>('2as');
-  const [selectedStreamId, setSelectedStreamId] = useState<string>('sci');
+  const allCombos: ComboOption[] = useMemo(() => {
+    const list: ComboOption[] = [];
+    for (const lvl of TOPIC_LEVEL_DEFINITIONS) {
+      if (lvl.stage === 'middle') {
+        list.push({
+          key: `${lvl.id}::general`,
+          levelId: lvl.id,
+          streamId: 'general',
+          label: lvl.cardLabel,
+        });
+      } else {
+        for (const st of lvl.streams) {
+          list.push({
+            key: `${lvl.id}::${st.id}`,
+            levelId: lvl.id,
+            streamId: st.id,
+            label: `${lvl.cardLabel} · ${st.label}`,
+          });
+        }
+      }
+    }
+    return list;
+  }, []);
+
+  const [step, setStep] = useState<TopicsStep>('select');
+  const [selectedComboKey, setSelectedComboKey] = useState<string>('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [subjectSearch, setSubjectSearch] = useState('');
   const [activeTopic, setActiveTopic] = useState<AppSubjectTopic | null>(null);
-  const [topicTab, setTopicTab] = useState<'exercises' | 'quiz'>('exercises');
+  const [topicTab, setTopicTab] = useState<'quiz' | 'exercises'>('quiz');
 
-  // Revealed solutions state (exercise index -> boolean)
-  const [revealedSolutions, setRevealedSolutions] = useState<Record<number, boolean>>({});
-  // Interactive quiz answers (question id -> selected option index)
+  // Step-by-step single question quiz state (dynamically shuffled)
+  const [shuffledQuestions, setShuffledQuestions] = useState<RealQuizQuestion[]>([]);
+  const [shuffledExercises, setShuffledExercises] = useState<PracticeExercise[]>([]);
+  const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
+  const [revealedSolutions, setRevealedSolutions] = useState<Record<number, boolean>>({});
+  const [selectionHint, setSelectionHint] = useState(false);
+  const [answerRequiredWarning, setAnswerRequiredWarning] = useState(false);
+
+  const selectedCombo = useMemo(
+    () => allCombos.find((c) => c.key === selectedComboKey) || null,
+    [allCombos, selectedComboKey]
+  );
+
+  const currentLevelId: TopicLevelId = selectedCombo?.levelId || '2as';
+  const currentStreamId: string = selectedCombo?.streamId || 'sci';
 
   const currentLevelDef = useMemo(
-    () => TOPIC_LEVEL_DEFINITIONS.find((l) => l.id === selectedLevelId) || TOPIC_LEVEL_DEFINITIONS[0],
-    [selectedLevelId]
+    () => TOPIC_LEVEL_DEFINITIONS.find((l) => l.id === currentLevelId) || TOPIC_LEVEL_DEFINITIONS[0],
+    [currentLevelId]
   );
 
   const currentStreamDef = useMemo(
     () =>
-      currentLevelDef.streams.find((s) => s.id === selectedStreamId) || currentLevelDef.streams[0],
-    [currentLevelDef, selectedStreamId]
-  );
-
-  const levelsInCycle = useMemo(
-    () => TOPIC_LEVEL_DEFINITIONS.filter((l) => l.stage === selectedCycle),
-    [selectedCycle]
+      currentLevelDef.streams.find((s) => s.id === currentStreamId) || currentLevelDef.streams[0],
+    [currentLevelDef, currentStreamId]
   );
 
   const subjectTopics = useMemo(() => {
-    const base = getTopicsForSelection(selectedLevelId, selectedStreamId);
+    const base = sortItemsByOrder(
+      getTopicsForSelection(currentLevelId, currentStreamId),
+      (tItem) => tItem.id,
+      editor.buttonOrder
+    );
     const q = subjectSearch.trim().toLowerCase();
     if (!q) return base;
     return base.filter(
@@ -67,7 +160,18 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
         item.subjectName.toLowerCase().includes(q) ||
         item.focusSummary.toLowerCase().includes(q)
     );
-  }, [selectedLevelId, selectedStreamId, subjectSearch]);
+  }, [currentLevelId, currentStreamId, subjectSearch, editor.buttonOrder]);
+
+  const handleProceedToSubjects = () => {
+    if (!selectedCombo) {
+      setIsDropdownOpen(true);
+      setSelectionHint(true);
+      return;
+    }
+    setSelectionHint(false);
+    setSubjectSearch('');
+    setStep('subjects');
+  };
 
   const handleBackNavigation = () => {
     if (step === 'topic') {
@@ -77,25 +181,23 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
     }
     if (step === 'subjects') {
       setSubjectSearch('');
-      setStep(currentLevelDef.stage === 'middle' ? 'level' : 'stream');
-      return;
-    }
-    if (step === 'stream') {
-      setStep('level');
-      return;
-    }
-    if (step === 'level') {
-      setStep('cycle');
+      setStep('select');
       return;
     }
     onBack();
   };
 
-  const openTopicDetail = (topic: AppSubjectTopic, initialTab: 'exercises' | 'quiz' = 'quiz') => {
+  const openTopicDetail = (topic: AppSubjectTopic, initialTab: 'quiz' | 'exercises' = 'quiz') => {
     setActiveTopic(topic);
     setTopicTab(initialTab);
-    setRevealedSolutions({});
+    setShuffledQuestions(shuffleQuizQuestions(topic.quizQuestions));
+    setShuffledExercises(shuffleArray(topic.exercises));
+    setActiveExerciseIndex(0);
+    setQuestionIndex(0);
+    setQuizCompleted(false);
     setSelectedAnswers({});
+    setRevealedSolutions({});
+    setAnswerRequiredWarning(false);
     setStep('topic');
   };
 
@@ -106,18 +208,37 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
   const handleAnswerSelect = (questionId: string, optionIdx: number) => {
     if (questionId in selectedAnswers) return;
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: optionIdx }));
+    setAnswerRequiredWarning(false);
   };
 
   const resetQuiz = () => {
+    if (activeTopic) {
+      setShuffledQuestions(shuffleQuizQuestions(activeTopic.quizQuestions));
+    }
+    if (shuffledExercises.length > 1) {
+      setActiveExerciseIndex((prev) => (prev + 1) % shuffledExercises.length);
+      setRevealedSolutions({});
+    }
     setSelectedAnswers({});
+    setQuestionIndex(0);
+    setQuizCompleted(false);
+    setAnswerRequiredWarning(false);
+  };
+
+  const handleRotateExerciseTopic = () => {
+    if (shuffledExercises.length <= 1) return;
+    setRevealedSolutions({});
+    setActiveExerciseIndex((prev) => (prev + 1) % shuffledExercises.length);
   };
 
   const quizStats = useMemo(() => {
-    if (!activeTopic) return { answered: 0, correct: 0, total: 0, scoreOutOf20: '0.0' };
-    const total = activeTopic.quizQuestions.length;
+    if (shuffledQuestions.length === 0) {
+      return { answered: 0, correct: 0, total: 0, scoreOutOf20: '0.0' };
+    }
+    const total = shuffledQuestions.length;
     let answered = 0;
     let correct = 0;
-    for (const q of activeTopic.quizQuestions) {
+    for (const q of shuffledQuestions) {
       if (q.id in selectedAnswers) {
         answered += 1;
         if (selectedAnswers[q.id] === q.correctIndex) {
@@ -127,50 +248,34 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
     }
     const scoreOutOf20 = total > 0 ? ((correct / total) * 20).toFixed(1) : '0.0';
     return { answered, correct, total, scoreOutOf20 };
-  }, [activeTopic, selectedAnswers]);
+  }, [shuffledQuestions, selectedAnswers]);
 
   const headerTitle = useMemo(() => {
-    if (step === 'cycle') return 'بنك المواضيع';
-    if (step === 'level') {
-      return selectedCycle === 'middle' ? 'المستوى المتوسط' : 'المستوى الثانوي';
-    }
-    if (step === 'stream') return currentLevelDef.fullLabel;
+    if (step === 'select') return 'بنك المواضيع والأسئلة';
     if (step === 'subjects') {
-      if (currentLevelDef.stage === 'middle') {
-        return currentLevelDef.cardLabel;
-      }
-      return `${currentLevelDef.shortTitle} ${currentStreamDef?.label || ''}`.trim();
+      return selectedCombo?.label || 'اختر المادة';
     }
     if (step === 'topic' && activeTopic) {
-      return activeTopic.buttonLabel;
+      return activeTopic.subjectName;
     }
     return t.appTopicsTitle;
-  }, [step, selectedCycle, currentLevelDef, currentStreamDef, activeTopic, t.appTopicsTitle]);
+  }, [step, selectedCombo, activeTopic, t.appTopicsTitle]);
 
-  const capsuleButtonClasses =
-    'group w-full min-h-[60px] rounded-full px-5 py-3 flex items-center justify-between gap-3 transition-all duration-200 cursor-pointer border ' +
-    'bg-gradient-to-l from-[#8979df]/70 via-[#c4baf2]/85 to-white/95 border-[#8f7fe3]/60 text-[#3e3184] ' +
-    'shadow-[0_10px_24px_-10px_rgba(92,76,174,0.45)] hover:shadow-[0_12px_28px_-8px_rgba(92,76,174,0.65)] hover:-translate-y-0.5 ' +
-    'dark:from-indigo-700/45 dark:via-indigo-950/80 dark:to-slate-900/95 dark:border-indigo-500/40 dark:text-indigo-100 dark:hover:border-indigo-400/70';
+  const currentQuestion =
+    shuffledQuestions[questionIndex] ? shuffledQuestions[questionIndex] : null;
 
-  const centeredCapsuleClasses =
-    'group w-full min-h-[60px] rounded-full px-6 py-3 flex items-center justify-center transition-all duration-200 cursor-pointer border ' +
-    'bg-gradient-to-l from-[#8979df]/70 via-[#c4baf2]/85 to-white/95 border-[#8f7fe3]/60 text-[#3e3184] ' +
-    'shadow-[0_10px_24px_-10px_rgba(92,76,174,0.45)] hover:shadow-[0_12px_28px_-8px_rgba(92,76,174,0.65)] hover:-translate-y-0.5 ' +
-    'dark:from-indigo-700/45 dark:via-indigo-950/80 dark:to-slate-900/95 dark:border-indigo-500/40 dark:text-indigo-100 dark:hover:border-indigo-400/70';
-
-  const capsuleIconBadgeClasses =
-    'w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ' +
-    'bg-white/85 text-[#5b49b8] shadow-xs dark:bg-indigo-900/80 dark:text-indigo-200';
+  const totalQuestions = shuffledQuestions.length;
+  const progressPercent =
+    totalQuestions > 0 ? Math.round(((questionIndex + 1) / totalQuestions) * 100) : 0;
 
   return (
-    <div className="min-h-full pb-16 max-w-4xl mx-auto space-y-5">
-      {/* Top Bar matching reference screenshots */}
-      <div className="rounded-3xl px-4 py-3.5 sm:px-6 flex items-center justify-between gap-3 bg-gradient-to-r from-[#9e8ce2] via-[#b0a2eb] to-[#c6bcf2] dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 border border-indigo-300/60 dark:border-indigo-800/60 shadow-md text-white">
+    <div className="min-h-full pb-16 max-w-3xl mx-auto space-y-5">
+      {/* Unified Academic Blue Header Bar */}
+      <div className="rounded-3xl px-4 py-3.5 sm:px-6 flex items-center justify-between gap-3 bg-gradient-to-r from-blue-600 to-sky-600 dark:from-slate-900 dark:to-slate-800 border border-blue-500/40 dark:border-slate-700 shadow-md text-white">
         <button
           type="button"
           onClick={handleBackNavigation}
-          className="flex items-center justify-center w-11 h-11 rounded-full bg-white/20 hover:bg-white/30 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-white transition-colors cursor-pointer shrink-0"
+          className="flex items-center justify-center w-11 h-11 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors cursor-pointer shrink-0"
           title={t.backLabel}
           aria-label={t.backLabel}
         >
@@ -179,325 +284,191 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
 
         <div className="text-center min-w-0 flex-1">
           <h1 className="text-base sm:text-xl font-black tracking-tight text-white truncate">
-            {headerTitle}
+            {step === 'select' ? editor.sectionHeader.title || headerTitle : headerTitle}
           </h1>
+          {step === 'select' && editor.sectionHeader.subtitle && (
+            <p className="text-[11px] text-sky-100 truncate mt-0.5">
+              {editor.sectionHeader.subtitle}
+            </p>
+          )}
         </div>
 
         <div className="w-11 shrink-0" />
       </div>
 
-      {/* Selection Screens matching screenshots */}
-      {step !== 'topic' && (
-        <div className="rounded-[2rem] p-5 sm:p-8 bg-gradient-to-b from-[#d8d0f7]/90 via-[#e8e3fb]/90 to-[#cfc5f4]/85 dark:from-slate-900/95 dark:via-indigo-950/35 dark:to-slate-900/95 border border-indigo-200/70 dark:border-indigo-900/50 shadow-sm space-y-5">
-          {/* STEP 1: Cycle Selection (المتوسط / الثانوي) */}
-          {step === 'cycle' && (
-            <div className="space-y-3.5 max-w-lg mx-auto">
-              <div className="space-y-3.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCycle('middle');
-                    setStep('level');
-                  }}
-                  className={capsuleButtonClasses}
-                >
-                  <span className={capsuleIconBadgeClasses}>
-                    <BookOpen className="w-5 h-5" />
-                  </span>
-                  <span className="flex-1 text-center text-base sm:text-lg font-black">
-                    المستوى المتوسط
-                  </span>
-                  <span className="w-10 shrink-0" />
-                </button>
+      {/* Admin Customization Toolbar */}
+      <div className="flex flex-col items-center">
+        <SectionAdminToolbar
+          isAdmin={editor.isAdmin}
+          isEditMode={editor.isEditMode}
+          hasOverrides={editor.hasOverrides}
+          onToggleEditMode={() => editor.setIsEditMode((v) => !v)}
+          onOpenAddEntry={(type) =>
+            editor.setEntryModal({ isOpen: true, initialType: type, editingEntry: null })
+          }
+          onEditSectionHeader={() => editor.setIsHeaderModalOpen(true)}
+          onResetSectionOverrides={() => customization?.onResetSectionOverrides()}
+        />
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCycle('secondary');
-                    setStep('level');
-                  }}
-                  className={capsuleButtonClasses}
-                >
-                  <span className={capsuleIconBadgeClasses}>
-                    <BookOpen className="w-5 h-5" />
-                  </span>
-                  <span className="flex-1 text-center text-base sm:text-lg font-black">
-                    المستوى الثانوي
-                  </span>
-                  <span className="w-10 shrink-0" />
-                </button>
-              </div>
-            </div>
-          )}
+        {editor.sectionHeader.note && (
+          <div className="w-full max-w-md mb-2 p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800 text-xs text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
+            {editor.sectionHeader.note}
+          </div>
+        )}
+      </div>
 
-          {/* STEP 2: Grade Selection inside Cycle */}
-          {step === 'level' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-w-2xl mx-auto">
-              {levelsInCycle.map((lvl) => (
-                <button
-                  key={lvl.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedLevelId(lvl.id);
-                    if (lvl.stage === 'middle') {
-                      setSelectedStreamId('general');
-                      setSubjectSearch('');
-                      setStep('subjects');
-                    } else {
-                      setSelectedStreamId(lvl.streams[0]?.id || 'sci');
-                      setStep('stream');
-                    }
-                  }}
-                  className={capsuleButtonClasses}
+      {/* STEP 1: Dropdown Level & Stream Selector + اختيار المادة CTA */}
+      {step === 'select' && (
+        <div className="rounded-[2rem] p-6 sm:p-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <div className="max-w-lg mx-auto space-y-4">
+            {/* Dropdown Trigger Box */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen((o) => !o)}
+                className="w-full min-h-[62px] px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-blue-500/70 dark:border-blue-600/70 shadow-sm flex items-center justify-between gap-3 cursor-pointer transition-all hover:border-blue-600"
+              >
+                <span className="w-6 shrink-0" />
+                <span
+                  className={`flex-1 text-center text-base sm:text-lg font-black ${
+                    selectedCombo
+                      ? 'text-slate-900 dark:text-white'
+                      : 'text-slate-500 dark:text-slate-400'
+                  }`}
                 >
-                  <span className={capsuleIconBadgeClasses}>
-                    <BookOpen className="w-5 h-5" />
-                  </span>
-                  <span className="flex-1 text-center text-base sm:text-lg font-black">
-                    {lvl.cardLabel}
-                  </span>
-                  <span className="w-10 shrink-0" />
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* STEP 3: Stream Selection for Secondary */}
-          {step === 'stream' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-w-2xl mx-auto">
-              {currentLevelDef.streams.map((st) => (
-                <button
-                  key={st.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedStreamId(st.id);
-                    setSubjectSearch('');
-                    setStep('subjects');
-                  }}
-                  className={centeredCapsuleClasses}
-                >
-                  <span className="text-center text-base sm:text-lg font-black">{st.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* STEP 4: Subject Capsules for Selected Grade & Stream */}
-          {step === 'subjects' && (
-            <div className="space-y-4 max-w-2xl mx-auto">
-              <div className="relative">
-                <Search className="w-4 h-4 text-[#5b49b8] dark:text-indigo-300 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={subjectSearch}
-                  onChange={(e) => setSubjectSearch(e.target.value)}
-                  placeholder="ابحث باسم المادة (رياضيات، تاريخ، إنجليزية، إسبانية، فلسفة...)"
-                  className="w-full min-h-[46px] pr-11 pl-4 py-2.5 rounded-full bg-white/90 dark:bg-slate-900/90 border border-indigo-200 dark:border-slate-700 text-xs sm:text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  {selectedCombo ? selectedCombo.label : 'اختر المستوى والشعبة'}
+                </span>
+                <ChevronDown
+                  className={`w-5 h-5 text-blue-600 dark:text-blue-400 transition-transform shrink-0 ${
+                    isDropdownOpen ? 'rotate-180' : ''
+                  }`}
                 />
-              </div>
+              </button>
 
-              {subjectTopics.length === 0 ? (
-                <div className="p-6 rounded-3xl bg-white/85 dark:bg-slate-900/85 text-center space-y-3 border border-indigo-200/70 dark:border-slate-800">
-                  <HelpCircle className="w-7 h-7 text-indigo-500 mx-auto" />
-                  <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
-                    لا توجد مادة مطابقة لبحثك
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setSubjectSearch('')}
-                    className="min-h-[44px] px-4 py-2 rounded-full bg-[#5b49b8] text-white text-xs font-black cursor-pointer"
-                  >
-                    عرض كل المواد
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                  {subjectTopics.map((topic) => (
-                    <button
-                      key={topic.id}
-                      type="button"
-                      onClick={() => openTopicDetail(topic, 'quiz')}
-                      className={centeredCapsuleClasses}
-                    >
-                      <span className="text-center text-base font-black">{topic.buttonLabel}</span>
-                    </button>
-                  ))}
+              {isDropdownOpen && (
+                <div className="mt-2 max-h-80 overflow-y-auto rounded-2xl bg-white dark:bg-slate-950 border-2 border-blue-500/70 dark:border-slate-700 shadow-xl divide-y divide-slate-100 dark:divide-slate-800">
+                  {allCombos.map((combo) => {
+                    const isPicked = combo.key === selectedComboKey;
+                    return (
+                      <button
+                        key={combo.key}
+                        type="button"
+                        onClick={() => {
+                          setSelectedComboKey(combo.key);
+                          setIsDropdownOpen(false);
+                          setSelectionHint(false);
+                        }}
+                        className={`w-full min-h-[46px] px-4 py-2.5 text-center text-xs sm:text-sm font-black transition-colors cursor-pointer ${
+                          isPicked
+                            ? 'bg-blue-600 text-white'
+                            : 'text-slate-800 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        {combo.label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
-          )}
+
+            {selectionHint && (
+              <p className="text-center text-xs font-bold text-red-600 dark:text-red-400">
+                يرجى اختيار المستوى والشعبة أولاً ثم الضغط على اختيار المادة
+              </p>
+            )}
+
+            {/* Centered "اختيار المادة" button */}
+            <div className="flex justify-center pt-1">
+              <button
+                type="button"
+                onClick={handleProceedToSubjects}
+                className="min-w-[220px] min-h-[54px] px-8 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-lg font-black shadow-md transition-all active:scale-[0.98] cursor-pointer"
+              >
+                اختيار المادة
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* STEP 5: Topic Exercises & Real Interactive Quiz */}
-      {step === 'topic' && activeTopic && (
-        <div className="space-y-4">
-          {/* Segmented Mode Tabs */}
-          <div className="rounded-2xl p-1.5 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-xs grid grid-cols-2 gap-1.5">
-            <button
-              type="button"
-              onClick={() => setTopicTab('quiz')}
-              className={`min-h-[46px] px-3 py-2 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                topicTab === 'quiz'
-                  ? 'bg-[#5b49b8] text-white shadow-sm'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <HelpCircle className="w-4 h-4 shrink-0" />
-              <span>أسئلة حقيقية تفاعلية</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTopicTab('exercises')}
-              className={`min-h-[46px] px-3 py-2 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                topicTab === 'exercises'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <BookOpen className="w-4 h-4 shrink-0" />
-              <span>مواضيع وتمارين محلولة</span>
-            </button>
+      {/* STEP 2: Subjects Grid */}
+      {step === 'subjects' && (
+        <div className="rounded-[2rem] p-5 sm:p-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={subjectSearch}
+              onChange={(e) => setSubjectSearch(e.target.value)}
+              placeholder="ابحث باسم المادة (رياضيات، علوم، تاريخ، إنجليزية، فلسفة...)"
+              className="w-full min-h-[46px] pr-11 pl-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            />
           </div>
 
-          {/* Focus Metadata Line (Unboxed typography per design discipline) */}
-          <div className="px-2 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
-            <span>{activeTopic.focusSummary}</span>
-            <span className="tabular-nums text-slate-500 dark:text-slate-400">
-              {currentLevelDef.shortTitle}
-              {currentStreamDef?.label ? ` · ${currentStreamDef.label}` : ''}
-            </span>
-          </div>
-
-          {/* Interactive Real Questions View */}
-          {topicTab === 'quiz' && (
-            <div className="space-y-4">
-              {/* Live Score Summary Bar */}
-              <div className="p-4 sm:p-5 rounded-3xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
-                <div className="space-y-0.5">
-                  <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
-                    اختبار الفهم السريع · {activeTopic.subjectName}
-                  </div>
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 tabular-nums">
-                    أجبت عن {quizStats.answered} من {quizStats.total} أسئلة · الإجابات الصحيحة:{' '}
-                    {quizStats.correct}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="text-left sm:text-right">
-                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
-                      النقطة التقديرية
-                    </span>
-                    <span className="text-lg font-black text-[#5b49b8] dark:text-indigo-300 tabular-nums">
-                      {quizStats.scoreOutOf20} / 20
-                    </span>
-                  </div>
-
-                  {quizStats.answered > 0 && (
+          {subjectTopics.length === 0 ? (
+            <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-950 text-center space-y-3 border border-slate-200 dark:border-slate-800">
+              <HelpCircle className="w-7 h-7 text-blue-600 mx-auto" />
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                لا توجد مادة مطابقة لبحثك
+              </p>
+              <button
+                type="button"
+                onClick={() => setSubjectSearch('')}
+                className="min-h-[44px] px-4 py-2 rounded-2xl bg-blue-600 text-white text-xs font-black cursor-pointer"
+              >
+                عرض كل المواد
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {subjectTopics.map((topic) => {
+                const ov = editor.overrides[topic.id];
+                if (ov?.hidden && !(editor.isAdmin && editor.isEditMode)) {
+                  return null;
+                }
+                const displayLabel = ov?.label || topic.buttonLabel;
+                const displaySub = ov?.subtitle || `${topic.quizQuestions.length} سؤال`;
+                const handleTopicClick = () => {
+                  if (ov?.actionType === 'text') {
+                    onShowInfo?.(ov.textTitle || displayLabel, ov.textBody || topic.focusSummary);
+                  } else if (ov?.actionType === 'url' && ov.url) {
+                    onOpenSite?.(ov.url);
+                  } else {
+                    openTopicDetail(topic, 'quiz');
+                  }
+                };
+                return (
+                  <div key={topic.id} className="space-y-1">
                     <button
                       type="button"
-                      onClick={resetQuiz}
-                      className="min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black flex items-center gap-1.5 transition-colors cursor-pointer"
+                      onClick={handleTopicClick}
+                      className={`w-full min-h-[58px] px-5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 hover:bg-blue-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-blue-400 text-slate-900 dark:text-white text-sm sm:text-base font-black shadow-xs flex items-center justify-between gap-2 transition-all hover:-translate-y-0.5 cursor-pointer ${
+                        ov?.hidden ? 'opacity-45' : ''
+                      }`}
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>إعادة المحاولة</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Questions List */}
-              {activeTopic.quizQuestions.map((question, qIdx) => {
-                const chosenIdx = selectedAnswers[question.id];
-                const isAnswered = chosenIdx !== undefined;
-                const isCorrect = chosenIdx === question.correctIndex;
-
-                return (
-                  <div
-                    key={question.id}
-                    className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4"
-                  >
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 tabular-nums">
-                        السؤال {qIdx + 1} من {activeTopic.quizQuestions.length}
+                      <span className="truncate">{displayLabel}</span>
+                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400 shrink-0 tabular-nums">
+                        {displaySub}
                       </span>
-                      <h2
-                        dir="auto"
-                        className="text-sm sm:text-base font-black text-slate-900 dark:text-white leading-relaxed"
-                      >
-                        {question.prompt}
-                      </h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-2.5">
-                      {question.options.map((opt, oIdx) => {
-                        const isThisSelected = chosenIdx === oIdx;
-                        const isThisCorrect = oIdx === question.correctIndex;
-
-                        let optionStyle =
-                          'bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-950/70 dark:hover:bg-indigo-950/50 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200';
-                        if (isAnswered) {
-                          if (isThisCorrect) {
-                            optionStyle =
-                              'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-900 dark:text-emerald-200';
-                          } else if (isThisSelected) {
-                            optionStyle =
-                              'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-900 dark:text-rose-200';
-                          } else {
-                            optionStyle =
-                              'bg-slate-50/60 dark:bg-slate-950/40 border-slate-200/70 dark:border-slate-800/70 text-slate-400 dark:text-slate-500';
+                    </button>
+                    {editor.isAdmin && editor.isEditMode && (
+                      <div className="flex justify-end px-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            editor.setEditingButton({
+                              id: topic.id,
+                              defaultLabel: topic.buttonLabel,
+                              defaultSubtitle: `${topic.quizQuestions.length} سؤال`,
+                              defaultUrl: '',
+                            })
                           }
-                        }
-
-                        return (
-                          <button
-                            key={oIdx}
-                            type="button"
-                            disabled={isAnswered}
-                            onClick={() => handleAnswerSelect(question.id, oIdx)}
-                            dir="auto"
-                            className={`w-full min-h-[48px] px-4 py-3 rounded-2xl border text-start text-xs sm:text-sm font-bold flex items-center justify-between gap-3 transition-colors ${
-                              isAnswered ? 'cursor-default' : 'cursor-pointer'
-                            } ${optionStyle}`}
-                          >
-                            <span className="flex-1">{opt}</span>
-                            {isAnswered && isThisCorrect && (
-                              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                            )}
-                            {isAnswered && isThisSelected && !isThisCorrect && (
-                              <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {isAnswered && (
-                      <div
-                        className={`p-3.5 rounded-2xl border text-xs leading-relaxed space-y-1 ${
-                          isCorrect
-                            ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/70 text-emerald-950 dark:text-emerald-200'
-                            : 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/70 text-amber-950 dark:text-amber-200'
-                        }`}
-                      >
-                        <div className="font-black flex items-center gap-1.5">
-                          {isCorrect ? (
-                            <>
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                              <span>إجابة صحيحة</span>
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
-                              <span>إجابة خاطئة — الإجابة الصحيحة موضحة باللون الأخضر</span>
-                            </>
-                          )}
-                        </div>
-                        <p dir="auto" className="font-semibold">
-                          {question.explanation}
-                        </p>
+                          className="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-sky-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          <span>تعديل</span>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -505,22 +476,276 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
               })}
             </div>
           )}
+        </div>
+      )}
 
-          {/* Practice Written Topics & Solutions View */}
-          {topicTab === 'exercises' && (
+      {/* STEP 3: Question-by-Question Interactive Quiz + Exercises */}
+      {step === 'topic' && activeTopic && (
+        <div className="space-y-4">
+          {/* Segmented Mode Tabs */}
+          <div className="rounded-2xl p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs grid grid-cols-2 gap-1.5">
+            <button
+              type="button"
+              onClick={() => setTopicTab('quiz')}
+              className={`min-h-[44px] px-3 py-2 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap ${
+                topicTab === 'quiz'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <HelpCircle className="w-4 h-4 shrink-0" />
+              <span>الأسئلة التفاعلية ({totalQuestions})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTopicTab('exercises')}
+              className={`min-h-[44px] px-3 py-2 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap ${
+                topicTab === 'exercises'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <BookOpen className="w-4 h-4 shrink-0" />
+              <span>تمارين ومواضيع محلولة</span>
+            </button>
+          </div>
+
+          {topicTab === 'quiz' && (
+            <div className="rounded-[2rem] p-5 sm:p-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+              {quizCompleted && quizStats.answered === quizStats.total && quizStats.total > 0 ? (
+                <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-950 border-2 border-blue-600 text-center space-y-4 shadow-md">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+                  <div>
+                    <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                      أنهيت جميع أسئلة {activeTopic.subjectName}
+                    </h2>
+                    <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mt-1 tabular-nums">
+                      الإجابات الصحيحة: {quizStats.correct} من {quizStats.total} · النتيجة التقديرية:{' '}
+                      {quizStats.scoreOutOf20} / 20
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={resetQuiz}
+                      className="min-h-[46px] px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-black flex items-center gap-2 cursor-pointer"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      <span>إعادة المحاولة بأسئلة متجددة</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleBackNavigation}
+                      className="min-h-[46px] px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-black cursor-pointer"
+                    >
+                      اختيار مادة أخرى
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                currentQuestion && (() => {
+                  const chosenIdx = selectedAnswers[currentQuestion.id];
+                  const isAnswered = chosenIdx !== undefined;
+                  const isCorrect = chosenIdx === currentQuestion.correctIndex;
+
+                  return (
+                    <div className="space-y-4">
+                      {/* Centered Progress Label + Shuffle Questions CTA */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs sm:text-sm font-black text-slate-700 dark:text-slate-200 tabular-nums">
+                            السؤال {questionIndex + 1} من {totalQuestions}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={resetQuiz}
+                            className="min-h-[36px] px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-sky-300 text-[11px] font-black flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5 shrink-0" />
+                            <span>تغيير الأسئلة</span>
+                          </button>
+                        </div>
+                        <div className="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Prominent Blue-Bordered Question Box */}
+                      <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-blue-600 shadow-xs text-center">
+                        <h2
+                          dir="auto"
+                          className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-relaxed"
+                        >
+                          {currentQuestion.prompt}
+                        </h2>
+                      </div>
+
+                      {/* 4 Centered Option Buttons */}
+                      <div className="space-y-3 pt-1">
+                        {currentQuestion.options.map((opt, oIdx) => {
+                          const isThisSelected = chosenIdx === oIdx;
+                          const isThisCorrect = oIdx === currentQuestion.correctIndex;
+
+                          let btnClasses =
+                            'bg-white hover:bg-blue-50/70 dark:bg-slate-950 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100';
+                          if (isAnswered) {
+                            if (isThisCorrect) {
+                              btnClasses =
+                                'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-200';
+                            } else if (isThisSelected) {
+                              btnClasses =
+                                'bg-red-50 dark:bg-red-950/60 border-red-500 text-red-900 dark:text-red-200';
+                            } else {
+                              btnClasses =
+                                'bg-slate-50/60 dark:bg-slate-900 border-slate-200/60 dark:border-slate-800/60 text-slate-400 dark:text-slate-500';
+                            }
+                          }
+
+                          return (
+                            <button
+                              key={oIdx}
+                              type="button"
+                              disabled={isAnswered}
+                              onClick={() => handleAnswerSelect(currentQuestion.id, oIdx)}
+                              dir="auto"
+                              className={`w-full min-h-[54px] px-5 py-3 rounded-2xl border-2 text-center text-sm sm:text-base font-black shadow-xs flex items-center justify-center gap-2.5 transition-all ${
+                                isAnswered ? 'cursor-default' : 'cursor-pointer active:scale-[0.99]'
+                              } ${btnClasses}`}
+                            >
+                              <span>{opt}</span>
+                              {isAnswered && isThisCorrect && (
+                                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                              )}
+                              {isAnswered && isThisSelected && !isThisCorrect && (
+                                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Explanation Box once answered */}
+                      {isAnswered && (
+                        <div
+                          className={`p-3.5 rounded-2xl border text-xs leading-relaxed space-y-1 ${
+                            isCorrect
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200'
+                              : 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-200'
+                          }`}
+                        >
+                          <div className="font-black">
+                            {isCorrect ? 'إجابة صحيحة' : 'توضيح الإجابة الصحيحة'}
+                          </div>
+                          <p dir="auto" className="font-semibold">
+                            {currentQuestion.explanation}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Required Answer Warning if trying to advance or show result unanswered */}
+                      {answerRequiredWarning && !isAnswered && (
+                        <div className="p-3 rounded-2xl bg-red-50 dark:bg-red-950/50 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-black flex items-center justify-center gap-2 text-center">
+                          <AlertCircle className="w-4 h-4 shrink-0" />
+                          <span>
+                            {questionIndex + 1 < totalQuestions
+                              ? 'لا يمكن الانتقال للسؤال التالي بدون اختيار إجابة أولاً.'
+                              : 'لا يمكن عرض النتيجة بدون الإجابة عن هذا السؤال أولاً.'}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Full-Width Bottom "التالي / عرض النتيجة" Button */}
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isAnswered) {
+                              setAnswerRequiredWarning(true);
+                              return;
+                            }
+                            setAnswerRequiredWarning(false);
+                            if (questionIndex + 1 < totalQuestions) {
+                              setQuestionIndex((i) => i + 1);
+                            } else {
+                              const allAnswered = shuffledQuestions.every(
+                                (q) => q.id in selectedAnswers
+                              );
+                              if (!allAnswered) {
+                                setAnswerRequiredWarning(true);
+                                return;
+                              }
+                              setQuizCompleted(true);
+                            }
+                          }}
+                          className={`w-full min-h-[52px] rounded-2xl font-black text-base shadow-md transition-all ${
+                            isAnswered
+                              ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                              : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 cursor-not-allowed'
+                          }`}
+                        >
+                          {questionIndex + 1 < totalQuestions ? 'التالي' : 'عرض النتيجة'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
+            </div>
+          )}
+
+          {/* Practice Written Topics & Solutions View (Dynamic Rotating Topics) */}
+          {topicTab === 'exercises' && shuffledExercises.length > 0 && (
             <div className="space-y-4">
-              {activeTopic.exercises.map((ex, idx) => {
-                const isSolutionOpen = Boolean(revealedSolutions[idx]);
-                return (
-                  <article
-                    key={idx}
-                    className="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4"
+              {/* Topic Switcher & Rotate Bar */}
+              <div className="p-3.5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-2.5">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {shuffledExercises.map((_, eIdx) => (
+                    <button
+                      key={eIdx}
+                      type="button"
+                      onClick={() => {
+                        setRevealedSolutions({});
+                        setActiveExerciseIndex(eIdx);
+                      }}
+                      className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-black transition-colors cursor-pointer ${
+                        activeExerciseIndex === eIdx
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      الموضوع {eIdx + 1}
+                    </button>
+                  ))}
+                </div>
+
+                {shuffledExercises.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleRotateExerciseTopic}
+                    className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-sky-300 text-xs font-black flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
                   >
+                    <RefreshCw className="w-3.5 h-3.5 shrink-0" />
+                    <span>تغيير الموضوع</span>
+                  </button>
+                )}
+              </div>
+
+              {(() => {
+                const ex = shuffledExercises[activeExerciseIndex] || shuffledExercises[0];
+                const isSolutionOpen = Boolean(revealedSolutions[activeExerciseIndex]);
+                return (
+                  <article className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
                       <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
                         {ex.title}
                       </h2>
-                      <span className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 tabular-nums">
+                      <span className="text-xs font-extrabold text-blue-600 dark:text-blue-400 tabular-nums">
                         {ex.pointsLabel}
                       </span>
                     </div>
@@ -540,8 +765,8 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
                     <div className="pt-2">
                       <button
                         type="button"
-                        onClick={() => toggleExerciseSolution(idx)}
-                        className="min-h-[44px] px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black flex items-center gap-2 transition-colors cursor-pointer"
+                        onClick={() => toggleExerciseSolution(activeExerciseIndex)}
+                        className="min-h-[44px] px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black flex items-center gap-2 transition-colors cursor-pointer"
                       >
                         {isSolutionOpen ? (
                           <>
@@ -557,7 +782,7 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
                       </button>
 
                       {isSolutionOpen && (
-                        <div className="mt-3 p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-2">
+                        <div className="mt-3 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-2">
                           <h3 className="text-xs font-black text-emerald-900 dark:text-emerald-200">
                             عناصر الحل والشرح:
                           </h3>
@@ -577,22 +802,60 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({ language = 'ar', o
                     </div>
                   </article>
                 );
-              })}
+              })()}
+
+              <div className="text-xs font-bold text-blue-600 dark:text-blue-400 text-center">
+                {currentLevelDef.shortTitle}
+                {currentStreamDef?.label ? ` · ${currentStreamDef.label}` : ''}
+              </div>
             </div>
           )}
-
-          {/* Bottom Back to Subjects Button */}
-          <div className="flex justify-start pt-2">
-            <button
-              type="button"
-              onClick={handleBackNavigation}
-              className="min-h-[46px] px-5 py-2.5 rounded-full bg-[#5b49b8] hover:bg-[#4b3aa6] text-white text-xs sm:text-sm font-black shadow-sm transition-colors cursor-pointer"
-            >
-              العودة إلى قائمة المواد
-            </button>
-          </div>
         </div>
       )}
+
+      {/* Custom Websites, Texts & Images Added to App Topics Section */}
+      {editor.entries.length > 0 && (
+        <div className="flex flex-col items-center">
+          <SectionCustomEntriesList
+            entries={editor.entries}
+            isAdmin={editor.isAdmin}
+            isEditMode={editor.isEditMode}
+            onOpenSite={(url) => onOpenSite?.(url)}
+            onShowInfo={onShowInfo}
+            onEditEntry={(entry) =>
+              editor.setEntryModal({ isOpen: true, initialType: entry.type, editingEntry: entry })
+            }
+            onDeleteEntry={(id) => customization?.onDeleteCustomEntry(id)}
+            onMoveEntry={(id, dir) => customization?.onMoveCustomEntry(id, dir)}
+          />
+        </div>
+      )}
+
+      <ButtonEditModal
+        target={editor.editingButton}
+        currentOverride={editor.editingButton ? editor.overrides[editor.editingButton.id] : undefined}
+        onSave={(id, next) => customization?.onSaveButtonOverride(id, next)}
+        onReset={(id) => customization?.onResetButtonOverride(id)}
+        onClose={() => editor.setEditingButton(null)}
+      />
+
+      <SectionEntryModal
+        isOpen={editor.entryModal.isOpen}
+        initialType={editor.entryModal.initialType}
+        editingEntry={editor.entryModal.editingEntry}
+        onSave={(entry, editingId) => customization?.onSaveCustomEntry(entry, editingId)}
+        onClose={() => editor.setEntryModal((p) => ({ ...p, isOpen: false }))}
+      />
+
+      <SectionHeaderEditModal
+        isOpen={editor.isHeaderModalOpen}
+        current={editor.sectionHeader}
+        defaultTitle="بنك المواضيع والأسئلة"
+        defaultSubtitle=""
+        onSave={(next) => customization?.onSaveSectionHeader?.(next)}
+        onReset={() => customization?.onResetSectionHeader?.()}
+        onClose={() => editor.setIsHeaderModalOpen(false)}
+      />
     </div>
   );
 };

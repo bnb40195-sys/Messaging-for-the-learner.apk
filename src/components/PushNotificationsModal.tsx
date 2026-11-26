@@ -350,7 +350,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-sky-400 flex items-center justify-center">
               <BellRing className="w-5 h-5" />
             </div>
             <div>
@@ -379,7 +379,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
               onClick={() => setActiveTab('inbox')}
               className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'inbox'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-sky-300 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400'
               }`}
             >
@@ -391,7 +391,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
               onClick={() => setActiveTab('send')}
               className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'send'
-                  ? 'bg-gradient-to-r from-indigo-600 to-emerald-600 text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-blue-600 to-emerald-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400'
               }`}
             >
@@ -407,7 +407,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
             className={`mb-3 p-3 rounded-2xl text-xs font-bold flex items-center gap-2 border ${
               statusFeedback.type === 'success'
                 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
-                : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
+                : 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
             }`}
           >
             {statusFeedback.type === 'success' ? (
@@ -430,7 +430,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                   className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
                     isAlertsActive
                       ? 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/35 dark:to-teal-950/25 border-emerald-200/80 dark:border-emerald-800/60'
-                      : 'bg-gradient-to-r from-indigo-50 to-emerald-50 dark:from-indigo-950/40 dark:to-emerald-950/30 border-indigo-200/80 dark:border-indigo-800/60'
+                      : 'bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-blue-950/40 dark:to-emerald-950/30 border-blue-200/80 dark:border-blue-800/60'
                   }`}
                 >
                   <div>
@@ -438,7 +438,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                       {isAlertsActive ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       ) : (
-                        <BellRing className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <BellRing className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
                       )}
                       <span>
                         حالة الإشعارات الفورية:{' '}
@@ -461,7 +461,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                       <button
                         onClick={handleEnablePush}
                         disabled={isEnablingPush}
-                        className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow-sm shrink-0 cursor-pointer disabled:opacity-60"
+                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-sm shrink-0 cursor-pointer disabled:opacity-60"
                       >
                         {isEnablingPush ? 'جاري التفعيل...' : 'تفعيل الإشعارات 🔔'}
                       </button>
@@ -521,19 +521,19 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                   key={item.id}
                   className={`p-3.5 rounded-2xl space-y-2 ${
                     isStrict
-                      ? 'bg-rose-50/90 dark:bg-rose-950/35 border-2 border-rose-400/80 dark:border-rose-700 shadow-sm'
+                      ? 'bg-red-50/90 dark:bg-red-950/35 border-2 border-red-400/80 dark:border-red-700 shadow-sm'
                       : 'bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {isStrict && (
-                        <span className="px-2 py-0.5 rounded-md bg-rose-600 text-white font-black text-[10px] inline-flex items-center gap-1">
+                        <span className="px-2 py-0.5 rounded-md bg-red-600 text-white font-black text-[10px] inline-flex items-center gap-1">
                           <ShieldAlert className="w-3 h-3" />
                           <span>إشعار صارم</span>
                         </span>
                       )}
-                      <span className="px-2.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[10px]">
+                      <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-sky-300 font-bold text-[10px]">
                         {item.tag}
                       </span>
                     </div>
@@ -547,7 +547,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                       {isAdmin && (
                         <button
                           onClick={() => onDeleteAnnouncement(item.id)}
-                          className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                          className="p-1 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors cursor-pointer"
                           title="حذف الإشعار"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -567,7 +567,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                   {item.targetUrl && (
                     <button
                       onClick={() => onOpenSite(item.targetUrl!)}
-                      className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 pt-0.5 cursor-pointer"
+                      className="text-[11px] font-bold text-blue-600 dark:text-sky-400 hover:underline flex items-center gap-1 pt-0.5 cursor-pointer"
                     >
                       <span>فتح الرابط المرفق</span>
                       <ExternalLink className="w-3 h-3" />
@@ -596,7 +596,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                     onSignOut();
                     onClose();
                   }}
-                  className="text-rose-600 dark:text-rose-400 font-bold hover:underline cursor-pointer shrink-0 mr-2"
+                  className="text-red-600 dark:text-red-400 font-bold hover:underline cursor-pointer shrink-0 mr-2"
                 >
                   خروج
                 </button>
@@ -613,7 +613,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="مثال: انطلاق الفرض الإلكتروني الأول 2026/2027"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -627,7 +627,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                     onClick={() => setPriority('normal')}
                     className={`py-2.5 px-3 rounded-xl text-xs font-extrabold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       priority === 'normal'
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                         : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800'
                     }`}
                   >
@@ -643,8 +643,8 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                     }}
                     className={`py-2.5 px-3 rounded-xl text-xs font-extrabold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       priority === 'strict'
-                        ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white border-rose-600 shadow-sm'
-                        : 'bg-slate-50 dark:bg-slate-950 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/60'
+                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-white border-red-600 shadow-sm'
+                        : 'bg-slate-50 dark:bg-slate-950 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/60'
                     }`}
                   >
                     <ShieldAlert className="w-3.5 h-3.5" />
@@ -653,7 +653,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                 </div>
 
                 {priority === 'strict' && (
-                  <p className="mt-2 p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-[11px] font-bold text-rose-700 dark:text-rose-300 leading-relaxed">
+                  <p className="mt-2 p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-[11px] font-bold text-red-700 dark:text-red-300 leading-relaxed">
                     سيظهر هذا الإشعار كنافذة تنبيه إجبارية وبارزة أمام جميع المتعلمين مع صوت تنبيه ولا يختفي إلا بعد الضغط على «تم الاطلاع».
                   </p>
                 )}
@@ -666,7 +666,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                 <select
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 >
                   <option value="إشعار صارم">إشعار صارم</option>
                   <option value="هام جداً">هام جداً</option>
@@ -688,7 +688,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   placeholder="اكتب تفاصيل الإشعار التي ستظهر على شاشات الطلبة..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 resize-none"
                 />
               </div>
 
@@ -703,7 +703,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                   value={targetUrl}
                   onChange={(e) => setTargetUrl(e.target.value)}
                   placeholder="https://devoir.onefd.edu.dz/"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -736,8 +736,8 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                 disabled={isSending}
                 className={`w-full py-3 rounded-xl hover:opacity-95 text-white font-extrabold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 ${
                   priority === 'strict'
-                    ? 'bg-gradient-to-r from-rose-600 via-red-600 to-rose-700 shadow-rose-600/25'
-                    : 'bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-600'
+                    ? 'bg-gradient-to-r from-red-600 via-red-700 to-orange-600 shadow-red-600/25'
+                    : 'bg-gradient-to-r from-blue-600 via-sky-600 to-emerald-600'
                 }`}
               >
                 {priority === 'strict' ? <ShieldAlert className="w-4 h-4" /> : <Send className="w-4 h-4" />}
@@ -754,7 +754,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
             {/* Admin-Only Email Configuration */}
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
               <div className="flex items-center gap-2 text-xs font-black text-slate-900 dark:text-white">
-                <Mail className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <Mail className="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" />
                 <span>تغيير / إضافة البريد الإلكتروني للمشرف</span>
               </div>
 
@@ -779,7 +779,7 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemoveAdminEmailItem(email)}
-                      className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                      className="p-1 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors cursor-pointer"
                       title="إزالة هذا البريد من صلاحية المشرف"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -796,12 +796,12 @@ export const PushNotificationsModal: React.FC<PushNotificationsModalProps> = ({
                   value={newAdminEmail}
                   onChange={(e) => setNewAdminEmail(e.target.value)}
                   placeholder="new-admin@gmail.com"
-                  className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 text-left"
+                  className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 text-left"
                 />
                 <button
                   type="submit"
                   disabled={isSavingAdminEmail}
-                  className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-60"
+                  className="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-60"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   <span>{isSavingAdminEmail ? 'جاري الحفظ...' : 'اعتماد البريد'}</span>

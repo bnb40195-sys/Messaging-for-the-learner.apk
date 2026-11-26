@@ -1,3 +1,35 @@
+import {
+  ARABIC_EXTRA,
+  CIVIC_EXTRA,
+  HISTORY_3AS_EXTRA,
+  HISTORY_MIDDLE_EXTRA,
+  HISTORY_SEC12_EXTRA,
+  ISLAMIC_EXTRA,
+  MATH_LIT_EXTRA,
+  MATH_MIDDLE_EXTRA,
+  MATH_SCI_EXTRA,
+  PHILO_EXTRA,
+  PHYSICS_MIDDLE_EXTRA,
+  PHYSICS_SEC_EXTRA,
+  SCIENCES_EXTRA,
+} from './quizQuestionsCore';
+import {
+  ACCOUNTING_EXTRA,
+  CIVIL_ENG_EXTRA,
+  ECONOMICS_EXTRA,
+  ELEC_ENG_EXTRA,
+  ENGLISH_EXTRA,
+  FRENCH_EXTRA,
+  GERMAN_EXTRA,
+  ITALIAN_EXTRA,
+  LAW_EXTRA,
+  MECH_ENG_EXTRA,
+  PROCESS_ENG_EXTRA,
+  SPANISH_EXTRA,
+  TECH_ENG_EXTRA,
+} from './quizQuestionsLangTech';
+import { EXTRA_SUBJECT_EXERCISES } from './extraTopicsExercises';
+
 export type TopicLevelId = '1am' | '2am' | '3am' | '4am' | '1as' | '2as' | '3as';
 
 export interface TopicStreamOption {
@@ -222,6 +254,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
             correctIndex: 2,
             explanation: 'بدأت مفاوضات إيفيان الأولى في ماي 1961 وتوّجت باتفاقيات إيفيان الثانية في 18 مارس 1962.',
           },
+          ...HISTORY_MIDDLE_EXTRA,
         ];
       }
       if (level === '1as' || level === '2as') {
@@ -254,6 +287,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
             correctIndex: 1,
             explanation: 'صاغه فرحات عباس بمشاركة مختلف التيارات الوطنية ليقدم للحلفاء وفرنسا مطالب الشعب الجزائري.',
           },
+          ...HISTORY_SEC12_EXTRA,
         ];
       }
       return [
@@ -285,6 +319,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
           correctIndex: 1,
           explanation: 'وقّعت 6 دول أوروبية معاهدة روما لتأسيس السوق الأوروبية المشتركة التي تطورت لاحقاً إلى الاتحاد الأوروبي.',
         },
+        ...HISTORY_3AS_EXTRA,
       ];
     },
   },
@@ -420,6 +455,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
             correctIndex: 1,
             explanation: 'نعوض x بـ (-2): f(-2) = 3 × (-2) = -6.',
           },
+          ...MATH_MIDDLE_EXTRA,
         ];
       }
       if (streamId === 'philo' || streamId === 'lang') {
@@ -452,6 +488,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
             correctIndex: 1,
             explanation: 'عدد الحدود يساوي (دليل الأخير - دليل الأول + 1) = 10 - 0 + 1 = 11 حداً.',
           },
+          ...MATH_LIT_EXTRA,
         ];
       }
       return [
@@ -483,6 +520,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
           correctIndex: 1,
           explanation: 'ln(x - 1) = 0 يكافئ x - 1 = e^0 = 1 ومنه x = 2.',
         },
+        ...MATH_SCI_EXTRA,
       ];
     },
   },
@@ -558,6 +596,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
           correctIndex: 2,
           explanation: 'الجمع بين اللفظ وضده مباشرة (دون أداة نفي) يسمى طباق إيجاب ويزيد المعنى وضوحاً وتأكيداً.',
         },
+        ...ARABIC_EXTRA,
       ];
     },
   },
@@ -633,6 +672,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
           correctIndex: 2,
           explanation: 'أزرق البروموثيمول يكون أصفراً في الوسط الحمضي، وأخضراً في الوسط المعتدل، وأزرقاً في الوسط القاعدي.',
         },
+        ...(isMiddle ? PHYSICS_MIDDLE_EXTRA : PHYSICS_SEC_EXTRA),
       ];
     },
   },
@@ -687,6 +727,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 0,
         explanation: 'تتكاثر وتتمايز اللمفاويات البائية LB إلى خلايا بلازمية مفرزة للأجسام المضادة النوعية.',
       },
+      ...SCIENCES_EXTRA,
     ],
   },
   {
@@ -742,6 +783,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'أخلاق الواجب عند كانط تنطلق من الإرادة الخيرة والواجب المطلق غير المشروط بنتائج مادية.',
       },
+      ...PHILO_EXTRA,
     ],
   },
   {
@@ -798,6 +840,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 0,
         explanation: '"Must" expresses strong obligation and duty.',
       },
+      ...ENGLISH_EXTRA,
     ],
   },
   {
@@ -848,6 +891,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 0,
         explanation: 'Lorsque le verbe introducteur est au présent (« dit »), le temps et l’indicateur ne changent pas.',
       },
+      ...FRENCH_EXTRA,
     ],
   },
   {
@@ -898,6 +942,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: '"Ayer" indica pretérito indefinido: "escribió".',
       },
+      ...SPANISH_EXTRA,
     ],
   },
   {
@@ -948,6 +993,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'Maskulinum ändert sich im Akkusativ von „der/ein“ zu „den/einen“.',
       },
+      ...GERMAN_EXTRA,
     ],
   },
   {
@@ -998,6 +1044,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: '"In bocca al lupo" è un modo di dire molto usato in italiano per augurare buona fortuna.',
       },
+      ...ITALIAN_EXTRA,
     ],
   },
   {
@@ -1048,6 +1095,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'الوقف هو حبس العين (مثل أرض أو بناء) عن التملك والتصرف وتوجيه ريعها للمنفعة العامة.',
       },
+      ...ISLAMIC_EXTRA,
     ],
   },
   {
@@ -1098,6 +1146,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'يُنتخب أعضاء المجلس الشعبي البلدي بالاقتراع العام المباشر ثم يرأس المجلسَ رئيسُه المنتخب.',
       },
+      ...CIVIC_EXTRA,
     ],
   },
   {
@@ -1148,6 +1197,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'العزم الأعظمي يتحقق في المقطع الذي ينعدم فيه جهد القاطع، أي في منتصف الرافدة.',
       },
+      ...CIVIL_ENG_EXTRA,
     ],
   },
   {
@@ -1198,6 +1248,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'التصبن يحرر الغليسيرول وصابون كربوكسيلات الصوديوم.',
       },
+      ...PROCESS_ENG_EXTRA,
     ],
   },
   {
@@ -1248,6 +1299,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'التوافق H7/g6 هو توافق خلوصي دقيق يُستعمل للتوجيه بالانزلاق.',
       },
+      ...MECH_ENG_EXTRA,
     ],
   },
   {
@@ -1298,6 +1350,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 0,
         explanation: 'القلاب JK (عندما J=K=1) يبدل حالته عند كل جبهة نبضة ساعة فيقسم التردد على 2.',
       },
+      ...ELEC_ENG_EXTRA,
     ],
   },
   {
@@ -1347,6 +1400,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'مخفض السرعة يُنقص سرعة الدوران الناتجة عن المحرك ويزيد العزم المنقول للآلة.',
       },
+      ...TECH_ENG_EXTRA,
     ],
   },
   {
@@ -1407,6 +1461,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 0,
         explanation: 'EBE = VA - (63 + 64) ويقيس المردودية الاقتصادية الصافية لنشاط المؤسسة الأساسي.',
       },
+      ...ACCOUNTING_EXTRA,
     ],
   },
   {
@@ -1457,6 +1512,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'القيادة الديمقراطية تتيح استشارة الفريق وتحفز الأداء والالتزام.',
       },
+      ...ECONOMICS_EXTRA,
     ],
   },
   {
@@ -1507,6 +1563,7 @@ const SUBJECT_BANK: SubjectDataBuilder[] = [
         correctIndex: 1,
         explanation: 'شركة التضامن SNC هي شركة أشخاص يسأل فيها جميع الشركاء تضامنياً وبصفة غير محدودة عن ديون الشركة.',
       },
+      ...LAW_EXTRA,
     ],
   },
 ];
@@ -1588,6 +1645,12 @@ export function getTopicsForSelection(levelId: TopicLevelId, streamId: string): 
   for (const key of keys) {
     const builder = SUBJECT_BANK.find((b) => b.key === key);
     if (!builder) continue;
+    const baseExercises = builder.buildExercises(levelId, streamId);
+    const extraExercises = EXTRA_SUBJECT_EXERCISES[key] || [];
+    const mergedExercises = [
+      ...baseExercises,
+      ...extraExercises.filter((ex) => !baseExercises.some((bEx) => bEx.title === ex.title)),
+    ];
     topics.push({
       id: `${levelId}-${streamId}-${key}`,
       subjectKey: key,
@@ -1596,7 +1659,7 @@ export function getTopicsForSelection(levelId: TopicLevelId, streamId: string): 
       levelId,
       streamId,
       focusSummary: builder.buildSummary(levelId, streamId),
-      exercises: builder.buildExercises(levelId, streamId),
+      exercises: mergedExercises,
       quizQuestions: builder.buildQuiz(levelId, streamId),
     });
   }

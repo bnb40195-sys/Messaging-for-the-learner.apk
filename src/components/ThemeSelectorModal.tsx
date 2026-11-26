@@ -1,15 +1,15 @@
 import React from 'react';
-import { Palette, Check, X, Globe, Image as ImageIcon, Settings } from 'lucide-react';
-import { APP_BACKGROUNDS, APP_THEMES, AppBackground, AppTheme } from '../types/theme';
+import { Palette, Check, X, Globe, Settings, Sun, Moon } from 'lucide-react';
+import { APP_THEMES, AppTheme, ColorMode } from '../types/theme';
 import { AppLanguage, TRANSLATIONS } from '../lib/i18n';
 
 interface ThemeSelectorModalProps {
   isOpen: boolean;
+  colorMode: ColorMode;
   currentTheme: AppTheme;
-  currentBackground: AppBackground;
   currentLanguage: AppLanguage;
+  onChangeColorMode: (mode: ColorMode) => void;
   onSelectTheme: (theme: AppTheme) => void;
-  onSelectBackground: (bg: AppBackground) => void;
   onSelectLanguage: (lang: AppLanguage) => void;
   onClose: () => void;
 }
@@ -22,11 +22,11 @@ const LANGUAGE_OPTIONS: { id: AppLanguage; label: string; native: string; dirLab
 
 export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
   isOpen,
+  colorMode,
   currentTheme,
-  currentBackground,
   currentLanguage,
+  onChangeColorMode,
   onSelectTheme,
-  onSelectBackground,
   onSelectLanguage,
   onClose,
 }) => {
@@ -44,9 +44,9 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
         className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-sky-400 flex items-center justify-center">
               <Settings className="w-5 h-5" />
             </div>
             <div>
@@ -54,22 +54,64 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
                 {t.settings}
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                {t.languageDesc} · {t.backgroundDesc}
+                {t.appearanceTitle} · {t.languageTitle} · {t.themeTitle}
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center text-sm font-bold cursor-pointer"
+            className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-sm font-bold cursor-pointer"
+            aria-label={t.closeMenu}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
+        {/* Light / Dark Mode Switcher */}
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-2">
+            {colorMode === 'dark' ? (
+              <Moon className="w-4 h-4 text-sky-400" />
+            ) : (
+              <Sun className="w-4 h-4 text-amber-500" />
+            )}
+            <h4 className="text-xs font-black text-slate-900 dark:text-white">
+              {t.appearanceTitle}
+            </h4>
+          </div>
+          <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => onChangeColorMode('light')}
+              className={`min-h-[44px] rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                colorMode === 'light'
+                  ? 'bg-white text-blue-700 shadow-sm border border-blue-200'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Sun className="w-4 h-4 text-amber-500 shrink-0" />
+              <span>{t.lightModeLabel}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onChangeColorMode('dark')}
+              className={`min-h-[44px] rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                colorMode === 'dark'
+                  ? 'bg-slate-800 text-sky-300 shadow-sm border border-slate-700'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Moon className="w-4 h-4 text-sky-400 shrink-0" />
+              <span>{t.darkModeLabel}</span>
+            </button>
+          </div>
+        </div>
+
         {/* Language Section */}
         <div className="space-y-2.5">
           <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <Globe className="w-4 h-4 text-blue-600 dark:text-sky-400" />
             <h4 className="text-xs font-black text-slate-900 dark:text-white">
               {t.languageTitle}
             </h4>
@@ -84,8 +126,8 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
                   onClick={() => onSelectLanguage(lang.id)}
                   className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
                     selected
-                      ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 ring-2 ring-indigo-500/20'
-                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-indigo-300'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/60 ring-2 ring-blue-500/20'
+                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-blue-300'
                   }`}
                 >
                   <span className="block text-xs font-black text-slate-900 dark:text-white">
@@ -100,52 +142,10 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
           </div>
         </div>
 
-        {/* Background Preset Section */}
+        {/* App Colors Grid (Backgrounds Removed, 9 Curated Color Themes Applied Globally) */}
         <div className="space-y-2.5">
           <div className="flex items-center gap-2">
-            <ImageIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <h4 className="text-xs font-black text-slate-900 dark:text-white">
-              {t.backgroundTitle}
-            </h4>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {Object.values(APP_BACKGROUNDS).map((bg) => {
-              const isSelected = currentBackground === bg.id;
-              const bgTitle =
-                currentLanguage === 'fr'
-                  ? bg.nameFr
-                  : currentLanguage === 'en'
-                  ? bg.nameEn
-                  : bg.nameAr;
-
-              return (
-                <button
-                  key={bg.id}
-                  type="button"
-                  onClick={() => onSelectBackground(bg.id)}
-                  className={`p-2.5 rounded-2xl border text-start transition-all flex items-center gap-2.5 cursor-pointer ${
-                    isSelected
-                      ? 'border-indigo-600 ring-2 ring-indigo-500/20 bg-indigo-50/60 dark:bg-indigo-950/40'
-                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-slate-300'
-                  }`}
-                >
-                  <span
-                    className={`w-7 h-7 rounded-xl shrink-0 shadow-xs ${bg.previewSwatch}`}
-                  />
-                  <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 leading-tight line-clamp-2 flex-1">
-                    {bgTitle}
-                  </span>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0" />}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Themes Grid */}
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-2">
-            <Palette className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <Palette className="w-4 h-4 text-blue-600 dark:text-sky-400" />
             <h4 className="text-xs font-black text-slate-900 dark:text-white">
               {t.themeTitle}
             </h4>
@@ -153,53 +153,42 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {Object.values(APP_THEMES).map((th) => {
               const isSelected = currentTheme === th.id;
+              const label =
+                currentLanguage === 'fr'
+                  ? th.nameFr
+                  : currentLanguage === 'en'
+                    ? th.nameEn
+                    : th.nameAr;
+
               return (
                 <button
                   key={th.id}
                   type="button"
                   onClick={() => onSelectTheme(th.id)}
-                  className={`p-3.5 rounded-2xl border text-start transition-all flex items-center justify-between gap-2 cursor-pointer ${
+                  className={`p-3 rounded-2xl border text-start transition-all flex items-center justify-between gap-2 cursor-pointer ${
                     isSelected
-                      ? 'border-indigo-600 ring-2 ring-indigo-500/20 shadow-md bg-indigo-50/50 dark:bg-indigo-950/40'
-                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-slate-300'
+                      ? 'border-blue-600 ring-2 ring-blue-500/20 shadow-md bg-blue-50/70 dark:bg-blue-950/40'
+                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="flex items-center gap-1 shrink-0">
-                      {th.id === 'futuristic-lavender' && (
-                        <>
-                          <span className="w-3.5 h-3.5 rounded-full bg-[#7c6bee] inline-block" />
-                          <span className="w-3.5 h-3.5 rounded-full bg-[#c6bffe] inline-block" />
-                        </>
-                      )}
-                      {th.id === 'cyber-dark' && (
-                        <>
-                          <span className="w-3.5 h-3.5 rounded-full bg-slate-950 border border-cyan-400 inline-block" />
-                          <span className="w-3.5 h-3.5 rounded-full bg-cyan-400 inline-block" />
-                        </>
-                      )}
-                      {th.id === 'academic-blue' && (
-                        <>
-                          <span className="w-3.5 h-3.5 rounded-full bg-blue-600 inline-block" />
-                          <span className="w-3.5 h-3.5 rounded-full bg-blue-300 inline-block" />
-                        </>
-                      )}
-                      {th.id === 'emerald-study' && (
-                        <>
-                          <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 inline-block" />
-                          <span className="w-3.5 h-3.5 rounded-full bg-emerald-300 inline-block" />
-                        </>
-                      )}
+                      <span
+                        className={`w-4 h-4 rounded-full inline-block ring-1 ring-black/10 ${th.swatchPrimaryClass}`}
+                      />
+                      <span
+                        className={`w-3.5 h-3.5 rounded-full inline-block ring-1 ring-black/10 ${th.swatchSecondaryClass}`}
+                      />
                     </div>
                     <div className="min-w-0">
                       <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                        {currentLanguage === 'ar' ? th.nameAr : th.nameEn}
+                        {label}
                       </h5>
                     </div>
                   </div>
 
                   {isSelected && (
-                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0">
                       <Check className="w-3 h-3" />
                     </span>
                   )}
@@ -210,8 +199,9 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
         </div>
 
         <button
+          type="button"
           onClick={onClose}
-          className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md cursor-pointer"
+          className="w-full min-h-[44px] py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md cursor-pointer"
         >
           {t.applyAndClose}
         </button>

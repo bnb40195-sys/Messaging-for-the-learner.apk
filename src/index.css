@@ -5,10 +5,219 @@
   :root {
     --font-sans: 'Cairo', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
-  
+
   html {
     font-family: var(--font-sans);
   }
+}
+
+/* Global App Color Theme Overrides (applies selected palette to all buttons, headers, badges, and surfaces) */
+html[data-app-theme="emerald-study"] {
+  --color-blue-50: #ecfdf5;
+  --color-blue-100: #d1fae5;
+  --color-blue-200: #a7f3d0;
+  --color-blue-300: #6ee7b7;
+  --color-blue-400: #34d399;
+  --color-blue-500: #10b981;
+  --color-blue-600: #059669;
+  --color-blue-700: #047857;
+  --color-blue-800: #065f46;
+  --color-blue-900: #064e3b;
+  --color-blue-950: #022c22;
+
+  --color-sky-50: #f0fdfa;
+  --color-sky-100: #ccfbf1;
+  --color-sky-200: #99f6e4;
+  --color-sky-300: #5eead4;
+  --color-sky-400: #2dd4bf;
+  --color-sky-500: #14b8a6;
+  --color-sky-600: #0d9488;
+  --color-sky-700: #0f766e;
+  --color-sky-800: #115e59;
+  --color-sky-900: #134e4a;
+  --color-sky-950: #042f2e;
+}
+
+html[data-app-theme="ocean-teal"] {
+  --color-blue-50: #f0fdfa;
+  --color-blue-100: #ccfbf1;
+  --color-blue-200: #99f6e4;
+  --color-blue-300: #5eead4;
+  --color-blue-400: #2dd4bf;
+  --color-blue-500: #14b8a6;
+  --color-blue-600: #0d9488;
+  --color-blue-700: #0f766e;
+  --color-blue-800: #115e59;
+  --color-blue-900: #134e4a;
+  --color-blue-950: #042f2e;
+
+  --color-sky-50: #ecfeff;
+  --color-sky-100: #cffafe;
+  --color-sky-200: #a5f3fc;
+  --color-sky-300: #67e8f9;
+  --color-sky-400: #22d3ee;
+  --color-sky-500: #06b6d4;
+  --color-sky-600: #0891b2;
+  --color-sky-700: #0e7490;
+  --color-sky-800: #155e75;
+  --color-sky-900: #164e63;
+  --color-sky-950: #083344;
+}
+
+html[data-app-theme="royal-purple"] {
+  --color-blue-50: #f5f3ff;
+  --color-blue-100: #ede9fe;
+  --color-blue-200: #ddd6fe;
+  --color-blue-300: #c4b5fd;
+  --color-blue-400: #a78bfa;
+  --color-blue-500: #8b5cf6;
+  --color-blue-600: #7c3aed;
+  --color-blue-700: #6d28d9;
+  --color-blue-800: #5b21b6;
+  --color-blue-900: #4c1d95;
+  --color-blue-950: #2e1065;
+
+  --color-sky-50: #faf5ff;
+  --color-sky-100: #f3e8ff;
+  --color-sky-200: #e9d5ff;
+  --color-sky-300: #d8b4fe;
+  --color-sky-400: #c084fc;
+  --color-sky-500: #a855f7;
+  --color-sky-600: #9333ea;
+  --color-sky-700: #7e22ce;
+  --color-sky-800: #6b21a8;
+  --color-sky-900: #581c87;
+  --color-sky-950: #3b0764;
+}
+
+html[data-app-theme="deep-indigo"] {
+  --color-blue-50: #eef2ff;
+  --color-blue-100: #e0e7ff;
+  --color-blue-200: #c7d2fe;
+  --color-blue-300: #a5b4fc;
+  --color-blue-400: #818cf8;
+  --color-blue-500: #6366f1;
+  --color-blue-600: #4f46e5;
+  --color-blue-700: #4338ca;
+  --color-blue-800: #3730a3;
+  --color-blue-900: #312e81;
+  --color-blue-950: #1e1b4b;
+
+  --color-sky-50: #f5f3ff;
+  --color-sky-100: #ede9fe;
+  --color-sky-200: #ddd6fe;
+  --color-sky-300: #c4b5fd;
+  --color-sky-400: #a78bfa;
+  --color-sky-500: #8b5cf6;
+  --color-sky-600: #7c3aed;
+  --color-sky-700: #6d28d9;
+  --color-sky-800: #5b21b6;
+  --color-sky-900: #4c1d95;
+  --color-sky-950: #2e1065;
+}
+
+html[data-app-theme="crimson-rose"] {
+  --color-blue-50: #fff1f2;
+  --color-blue-100: #ffe4e6;
+  --color-blue-200: #fecdd3;
+  --color-blue-300: #fda4af;
+  --color-blue-400: #fb7185;
+  --color-blue-500: #f43f5e;
+  --color-blue-600: #e11d48;
+  --color-blue-700: #be123c;
+  --color-blue-800: #9f1239;
+  --color-blue-900: #881337;
+  --color-blue-950: #4c0519;
+
+  --color-sky-50: #fdf2f8;
+  --color-sky-100: #fce7f3;
+  --color-sky-200: #fbcfe8;
+  --color-sky-300: #f9a8d4;
+  --color-sky-400: #f472b6;
+  --color-sky-500: #ec4899;
+  --color-sky-600: #db2777;
+  --color-sky-700: #be185d;
+  --color-sky-800: #9d174d;
+  --color-sky-900: #831843;
+  --color-sky-950: #500724;
+}
+
+html[data-app-theme="warm-amber"] {
+  --color-blue-50: #fffbeb;
+  --color-blue-100: #fef3c7;
+  --color-blue-200: #fde68a;
+  --color-blue-300: #fcd34d;
+  --color-blue-400: #fbbf24;
+  --color-blue-500: #f59e0b;
+  --color-blue-600: #b45309;
+  --color-blue-700: #92400e;
+  --color-blue-800: #78350f;
+  --color-blue-900: #78350f;
+  --color-blue-950: #451a03;
+
+  --color-sky-50: #fff7ed;
+  --color-sky-100: #ffedd5;
+  --color-sky-200: #fed7aa;
+  --color-sky-300: #fdba74;
+  --color-sky-400: #fb923c;
+  --color-sky-500: #f97316;
+  --color-sky-600: #d97706;
+  --color-sky-700: #b45309;
+  --color-sky-800: #9a3412;
+  --color-sky-900: #7c2d12;
+  --color-sky-950: #431407;
+}
+
+html[data-app-theme="sunset-orange"] {
+  --color-blue-50: #fff7ed;
+  --color-blue-100: #ffedd5;
+  --color-blue-200: #fed7aa;
+  --color-blue-300: #fdba74;
+  --color-blue-400: #fb923c;
+  --color-blue-500: #f97316;
+  --color-blue-600: #ea580c;
+  --color-blue-700: #c2410c;
+  --color-blue-800: #9a3412;
+  --color-blue-900: #7c2d12;
+  --color-blue-950: #431407;
+
+  --color-sky-50: #fffbeb;
+  --color-sky-100: #fef3c7;
+  --color-sky-200: #fde68a;
+  --color-sky-300: #fcd34d;
+  --color-sky-400: #fbbf24;
+  --color-sky-500: #f59e0b;
+  --color-sky-600: #d97706;
+  --color-sky-700: #b45309;
+  --color-sky-800: #92400e;
+  --color-sky-900: #78350f;
+  --color-sky-950: #451a03;
+}
+
+html[data-app-theme="slate-classic"] {
+  --color-blue-50: #f8fafc;
+  --color-blue-100: #f1f5f9;
+  --color-blue-200: #e2e8f0;
+  --color-blue-300: #cbd5e1;
+  --color-blue-400: #94a3b8;
+  --color-blue-500: #64748b;
+  --color-blue-600: #334155;
+  --color-blue-700: #1e293b;
+  --color-blue-800: #1e293b;
+  --color-blue-900: #0f172a;
+  --color-blue-950: #020617;
+
+  --color-sky-50: #f8fafc;
+  --color-sky-100: #f1f5f9;
+  --color-sky-200: #e2e8f0;
+  --color-sky-300: #cbd5e1;
+  --color-sky-400: #94a3b8;
+  --color-sky-500: #64748b;
+  --color-sky-600: #475569;
+  --color-sky-700: #334155;
+  --color-sky-800: #1e293b;
+  --color-sky-900: #0f172a;
+  --color-sky-950: #020617;
 }
 
 /* Custom sleek scrollbar */

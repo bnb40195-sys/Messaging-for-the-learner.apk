@@ -1,9 +1,23 @@
-export type AppTheme = 'futuristic-lavender' | 'cyber-dark' | 'academic-blue' | 'emerald-study';
+export type ColorMode = 'light' | 'dark';
+
+export type AppTheme =
+  | 'academic-blue'
+  | 'emerald-study'
+  | 'ocean-teal'
+  | 'royal-purple'
+  | 'warm-amber'
+  | 'crimson-rose'
+  | 'deep-indigo'
+  | 'sunset-orange'
+  | 'slate-classic';
 
 export interface ThemeConfig {
   id: AppTheme;
   nameAr: string;
+  nameFr: string;
   nameEn: string;
+  swatchPrimaryClass: string;
+  swatchSecondaryClass: string;
   bgGradient: string;
   cardBg: string;
   headerBg: string;
@@ -15,128 +29,175 @@ export interface ThemeConfig {
 }
 
 export const APP_THEMES: Record<AppTheme, ThemeConfig> = {
-  'futuristic-lavender': {
-    id: 'futuristic-lavender',
-    nameAr: 'أرجواني مستقبلي 2027 (نيومورفيك)',
-    nameEn: 'Futuristic Lavender',
-    bgGradient: 'bg-gradient-to-b from-[#f1ecfe] via-[#f7f5ff] to-[#fbfaff] dark:from-[#0f0b1f] dark:via-[#15102a] dark:to-[#0a0714]',
-    cardBg: 'bg-white/80 dark:bg-slate-900/85 backdrop-blur-md border-indigo-100/90 dark:border-indigo-900/40 shadow-lg shadow-indigo-500/5',
-    headerBg: 'bg-gradient-to-r from-[#7c6bee] via-[#6a57e7] to-[#5542db]',
-    primaryButton: 'bg-gradient-to-r from-[#dcd7fe] via-[#c6bffe] to-[#a499fe] hover:from-[#cfc7fe] hover:to-[#9385fd] text-[#312579] border-white/60 dark:border-indigo-400/30',
-    accentText: 'text-indigo-700 dark:text-indigo-300',
-    accentBorder: 'border-indigo-300 dark:border-indigo-700',
-    badgeBg: 'bg-[#7564eb] text-white',
-    glowEffect: 'shadow-indigo-500/20'
-  },
-  'cyber-dark': {
-    id: 'cyber-dark',
-    nameAr: 'الوضع الداكن السيبراني (OLED Cyber)',
-    nameEn: 'Cyber Dark',
-    bgGradient: 'bg-gradient-to-b from-[#090a12] via-[#0d101d] to-[#05060b] text-slate-100',
-    cardBg: 'bg-[#121629]/90 backdrop-blur-md border-cyan-500/20 shadow-xl shadow-cyan-500/5 text-slate-100',
-    headerBg: 'bg-gradient-to-r from-[#111827] via-[#1e1b4b] to-[#0f172a] border-b border-cyan-500/20',
-    primaryButton: 'bg-gradient-to-r from-cyan-950 via-slate-900 to-indigo-950 hover:from-cyan-900 hover:to-indigo-900 text-cyan-300 border-cyan-500/30',
-    accentText: 'text-cyan-400',
-    accentBorder: 'border-cyan-500/40',
-    badgeBg: 'bg-cyan-500 text-slate-950',
-    glowEffect: 'shadow-cyan-500/20'
-  },
   'academic-blue': {
     id: 'academic-blue',
-    nameAr: 'أزرق أكاديمي هادئ (Oxford Blue)',
+    nameAr: 'الأزرق الأكاديمي (الافتراضي)',
+    nameFr: 'Bleu académique',
     nameEn: 'Academic Blue',
-    bgGradient: 'bg-gradient-to-b from-[#e8f1fc] via-[#f1f6fd] to-[#fafdff] dark:from-[#071324] dark:via-[#0c1e38] dark:to-[#040b15]',
-    cardBg: 'bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-blue-200 dark:border-blue-900/40 shadow-lg shadow-blue-500/5',
-    headerBg: 'bg-gradient-to-r from-[#1d4ed8] via-[#2563eb] to-[#3b82f6]',
-    primaryButton: 'bg-gradient-to-r from-[#bfdbfe] via-[#93c5fd] to-[#60a5fa] hover:from-[#93c5fd] hover:to-[#3b82f6] text-[#1e3a8a] border-white/60 dark:border-blue-400/30',
-    accentText: 'text-blue-700 dark:text-blue-300',
+    swatchPrimaryClass: 'bg-[#2563eb]',
+    swatchSecondaryClass: 'bg-[#38bdf8]',
+    bgGradient:
+      'bg-gradient-to-b from-slate-100 via-blue-50/60 to-slate-50 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-slate-200 dark:border-slate-800 shadow-md shadow-slate-900/5',
+    headerBg: 'bg-gradient-to-r from-blue-600 via-blue-700 to-sky-600',
+    primaryButton:
+      'bg-blue-600 hover:bg-blue-700 text-white border-blue-500/40 dark:border-blue-500/30',
+    accentText: 'text-blue-700 dark:text-sky-300',
     accentBorder: 'border-blue-300 dark:border-blue-700',
     badgeBg: 'bg-blue-600 text-white',
-    glowEffect: 'shadow-blue-500/20'
+    glowEffect: 'shadow-blue-600/15',
   },
   'emerald-study': {
     id: 'emerald-study',
-    nameAr: 'أخضر زمردي للتركيز (Emerald Focus)',
-    nameEn: 'Emerald Focus',
-    bgGradient: 'bg-gradient-to-b from-[#eaf7f1] via-[#f2faf6] to-[#fcfffd] dark:from-[#061912] dark:via-[#0b281d] dark:to-[#030e0a]',
-    cardBg: 'bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-emerald-200 dark:border-emerald-900/40 shadow-lg shadow-emerald-500/5',
-    headerBg: 'bg-gradient-to-r from-[#047857] via-[#059669] to-[#10b981]',
-    primaryButton: 'bg-gradient-to-r from-[#a7f3d0] via-[#6ee7b7] to-[#34d399] hover:from-[#6ee7b7] hover:to-[#10b981] text-[#064e3b] border-white/60 dark:border-emerald-400/30',
+    nameAr: 'الأخضر الزمردي',
+    nameFr: 'Vert émeraude',
+    nameEn: 'Emerald Green',
+    swatchPrimaryClass: 'bg-[#059669]',
+    swatchSecondaryClass: 'bg-[#34d399]',
+    bgGradient:
+      'bg-gradient-to-b from-emerald-50/80 via-slate-50 to-white text-slate-900 dark:from-slate-950 dark:via-emerald-950/20 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-emerald-200/80 dark:border-emerald-900/40 shadow-md shadow-emerald-900/5',
+    headerBg: 'bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600',
+    primaryButton:
+      'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500/40 dark:border-emerald-500/30',
     accentText: 'text-emerald-700 dark:text-emerald-300',
     accentBorder: 'border-emerald-300 dark:border-emerald-700',
     badgeBg: 'bg-emerald-600 text-white',
-    glowEffect: 'shadow-emerald-500/20'
-  }
+    glowEffect: 'shadow-emerald-600/15',
+  },
+  'ocean-teal': {
+    id: 'ocean-teal',
+    nameAr: 'الأزرق الفيروزي',
+    nameFr: 'Turquoise océan',
+    nameEn: 'Ocean Teal',
+    swatchPrimaryClass: 'bg-[#0d9488]',
+    swatchSecondaryClass: 'bg-[#2dd4bf]',
+    bgGradient:
+      'bg-gradient-to-b from-teal-50/80 via-cyan-50/50 to-slate-50 text-slate-900 dark:from-slate-950 dark:via-teal-950/25 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-teal-200/80 dark:border-teal-900/40 shadow-md shadow-teal-900/5',
+    headerBg: 'bg-gradient-to-r from-teal-700 via-teal-600 to-cyan-600',
+    primaryButton:
+      'bg-teal-600 hover:bg-teal-700 text-white border-teal-500/40 dark:border-teal-500/30',
+    accentText: 'text-teal-700 dark:text-teal-300',
+    accentBorder: 'border-teal-300 dark:border-teal-700',
+    badgeBg: 'bg-teal-600 text-white',
+    glowEffect: 'shadow-teal-600/15',
+  },
+  'royal-purple': {
+    id: 'royal-purple',
+    nameAr: 'البنفسجي الملكي',
+    nameFr: 'Violet royal',
+    nameEn: 'Royal Purple',
+    swatchPrimaryClass: 'bg-[#7c3aed]',
+    swatchSecondaryClass: 'bg-[#c084fc]',
+    bgGradient:
+      'bg-gradient-to-b from-violet-50/80 via-purple-50/40 to-slate-50 text-slate-900 dark:from-slate-950 dark:via-violet-950/25 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-violet-200/80 dark:border-violet-900/40 shadow-md shadow-violet-900/5',
+    headerBg: 'bg-gradient-to-r from-violet-700 via-purple-600 to-fuchsia-600',
+    primaryButton:
+      'bg-violet-600 hover:bg-violet-700 text-white border-violet-500/40 dark:border-violet-500/30',
+    accentText: 'text-violet-700 dark:text-violet-300',
+    accentBorder: 'border-violet-300 dark:border-violet-700',
+    badgeBg: 'bg-violet-600 text-white',
+    glowEffect: 'shadow-violet-600/15',
+  },
+  'deep-indigo': {
+    id: 'deep-indigo',
+    nameAr: 'النيلي العميق',
+    nameFr: 'Indigo profond',
+    nameEn: 'Deep Indigo',
+    swatchPrimaryClass: 'bg-[#4f46e5]',
+    swatchSecondaryClass: 'bg-[#818cf8]',
+    bgGradient:
+      'bg-gradient-to-b from-indigo-50/80 via-slate-50 to-white text-slate-900 dark:from-slate-950 dark:via-indigo-950/25 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-indigo-200/80 dark:border-indigo-900/40 shadow-md shadow-indigo-900/5',
+    headerBg: 'bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-600',
+    primaryButton:
+      'bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-500/40 dark:border-indigo-500/30',
+    accentText: 'text-indigo-700 dark:text-indigo-300',
+    accentBorder: 'border-indigo-300 dark:border-indigo-700',
+    badgeBg: 'bg-indigo-600 text-white',
+    glowEffect: 'shadow-indigo-600/15',
+  },
+  'crimson-rose': {
+    id: 'crimson-rose',
+    nameAr: 'الأحمر القرمزي',
+    nameFr: 'Rose cramoisi',
+    nameEn: 'Crimson Rose',
+    swatchPrimaryClass: 'bg-[#e11d48]',
+    swatchSecondaryClass: 'bg-[#fb7185]',
+    bgGradient:
+      'bg-gradient-to-b from-rose-50/80 via-slate-50 to-white text-slate-900 dark:from-slate-950 dark:via-rose-950/20 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-rose-200/80 dark:border-rose-900/40 shadow-md shadow-rose-900/5',
+    headerBg: 'bg-gradient-to-r from-rose-700 via-rose-600 to-pink-600',
+    primaryButton:
+      'bg-rose-600 hover:bg-rose-700 text-white border-rose-500/40 dark:border-rose-500/30',
+    accentText: 'text-rose-700 dark:text-rose-300',
+    accentBorder: 'border-rose-300 dark:border-rose-700',
+    badgeBg: 'bg-rose-600 text-white',
+    glowEffect: 'shadow-rose-600/15',
+  },
+  'warm-amber': {
+    id: 'warm-amber',
+    nameAr: 'الذهبي الكهرماني',
+    nameFr: 'Ambre doré',
+    nameEn: 'Warm Amber',
+    swatchPrimaryClass: 'bg-[#d97706]',
+    swatchSecondaryClass: 'bg-[#fbbf24]',
+    bgGradient:
+      'bg-gradient-to-b from-amber-50/80 via-slate-50 to-white text-slate-900 dark:from-slate-950 dark:via-amber-950/20 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-amber-200/80 dark:border-amber-900/40 shadow-md shadow-amber-900/5',
+    headerBg: 'bg-gradient-to-r from-amber-700 via-amber-600 to-orange-600',
+    primaryButton:
+      'bg-amber-700 hover:bg-amber-800 text-white border-amber-600/40 dark:border-amber-500/30',
+    accentText: 'text-amber-700 dark:text-amber-300',
+    accentBorder: 'border-amber-300 dark:border-amber-700',
+    badgeBg: 'bg-amber-700 text-white',
+    glowEffect: 'shadow-amber-600/15',
+  },
+  'sunset-orange': {
+    id: 'sunset-orange',
+    nameAr: 'البرتقالي المشرق',
+    nameFr: 'Orange couchant',
+    nameEn: 'Sunset Orange',
+    swatchPrimaryClass: 'bg-[#ea580c]',
+    swatchSecondaryClass: 'bg-[#fb923c]',
+    bgGradient:
+      'bg-gradient-to-b from-orange-50/80 via-slate-50 to-white text-slate-900 dark:from-slate-950 dark:via-orange-950/20 dark:to-slate-950 dark:text-slate-100',
+    cardBg:
+      'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-orange-200/80 dark:border-orange-900/40 shadow-md shadow-orange-900/5',
+    headerBg: 'bg-gradient-to-r from-orange-700 via-orange-600 to-amber-600',
+    primaryButton:
+      'bg-orange-600 hover:bg-orange-700 text-white border-orange-500/40 dark:border-orange-500/30',
+    accentText: 'text-orange-700 dark:text-orange-300',
+    accentBorder: 'border-orange-300 dark:border-orange-700',
+    badgeBg: 'bg-orange-600 text-white',
+    glowEffect: 'shadow-orange-600/15',
+  },
+  'slate-classic': {
+    id: 'slate-classic',
+    nameAr: 'الرمادي الكلاسيكي',
+    nameFr: 'Ardoise classique',
+    nameEn: 'Slate Classic',
+    swatchPrimaryClass: 'bg-[#334155]',
+    swatchSecondaryClass: 'bg-[#94a3b8]',
+    bgGradient:
+      'bg-gradient-to-b from-slate-100 via-slate-50 to-white text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-black dark:text-slate-100',
+    cardBg:
+      'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm',
+    headerBg: 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900',
+    primaryButton:
+      'bg-slate-800 hover:bg-slate-900 text-white border-slate-700',
+    accentText: 'text-slate-700 dark:text-slate-300',
+    accentBorder: 'border-slate-300 dark:border-slate-700',
+    badgeBg: 'bg-slate-800 text-white',
+    glowEffect: 'shadow-slate-800/15',
+  },
 };
-
-export type AppBackground =
-  | 'theme-default'
-  | 'night-aurora'
-  | 'ocean-breeze'
-  | 'royal-sunset'
-  | 'pure-dark'
-  | 'clean-light';
-
-export interface BackgroundPreset {
-  id: AppBackground;
-  nameAr: string;
-  nameFr: string;
-  nameEn: string;
-  className: string;
-  previewSwatch: string;
-  isDarkSurface?: boolean;
-}
-
-export const APP_BACKGROUNDS: Record<AppBackground, BackgroundPreset> = {
-  'theme-default': {
-    id: 'theme-default',
-    nameAr: 'خلفية السمة الافتراضية',
-    nameFr: 'Fond du thème par défaut',
-    nameEn: 'Default Theme Backdrop',
-    className: '',
-    previewSwatch: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-700',
-  },
-  'night-aurora': {
-    id: 'night-aurora',
-    nameAr: 'شفق ليلي بنفسجي',
-    nameFr: 'Aurore nocturne',
-    nameEn: 'Night Aurora',
-    className: 'bg-gradient-to-br from-[#0b091c] via-[#1c113a] to-[#081b2e] text-slate-100',
-    previewSwatch: 'bg-gradient-to-br from-[#0b091c] via-[#4c1d95] to-[#0e7490]',
-    isDarkSurface: true,
-  },
-  'ocean-breeze': {
-    id: 'ocean-breeze',
-    nameAr: 'نسيم المحيط الأزرق',
-    nameFr: 'Brise océanique',
-    nameEn: 'Ocean Breeze',
-    className: 'bg-gradient-to-br from-[#e0f2fe] via-[#ecfeff] to-[#f0fdf4] dark:from-[#041524] dark:via-[#082438] dark:to-[#041b1a]',
-    previewSwatch: 'bg-gradient-to-br from-sky-400 via-cyan-300 to-teal-400',
-  },
-  'royal-sunset': {
-    id: 'royal-sunset',
-    nameAr: 'غروب دافئ ناعم',
-    nameFr: 'Coucher de soleil doux',
-    nameEn: 'Warm Sunset',
-    className: 'bg-gradient-to-br from-[#fff7ed] via-[#fdf2f8] to-[#eef2ff] dark:from-[#1f1018] dark:via-[#1b122b] dark:to-[#0f172a]',
-    previewSwatch: 'bg-gradient-to-br from-amber-300 via-rose-300 to-indigo-400',
-  },
-  'pure-dark': {
-    id: 'pure-dark',
-    nameAr: 'خلفية داكنة نقية (OLED)',
-    nameFr: 'Noir pur (OLED)',
-    nameEn: 'Pure Dark (OLED)',
-    className: 'bg-[#05060a] text-slate-100',
-    previewSwatch: 'bg-slate-950 border border-slate-700',
-    isDarkSurface: true,
-  },
-  'clean-light': {
-    id: 'clean-light',
-    nameAr: 'خلفية بيضاء صافية',
-    nameFr: 'Blanc épuré',
-    nameEn: 'Crisp White',
-    className: 'bg-slate-50 text-slate-900',
-    previewSwatch: 'bg-white border border-slate-300',
-  },
-};
-

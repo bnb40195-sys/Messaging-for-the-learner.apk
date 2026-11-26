@@ -411,26 +411,78 @@ export async function upsertRegisteredStudent(params: {
   const docRef = doc(db, 'registered_students', cleanKey);
   const path = `registered_students/${cleanKey}`;
 
+  const getServerOrCachedSnap = async () => {
+    try {
+      return await getDocFromServer(docRef);
+    } catch {
+      return await getDoc(docRef);
+    }
+  };
+
   try {
-    const snap = await getDoc(docRef);
+    const snap = await getServerOrCachedSnap();
     if (!snap.exists()) {
-      await setDoc(docRef, {
-        studentKey: cleanKey,
-        displayName: cleanName,
-        levelBadge: cleanLevel,
-        isOnline: params.isOnline,
-        lastActiveAt: serverTimestamp(),
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      try {
+        await setDoc(docRef, {
+          studentKey: cleanKey,
+          displayName: cleanName,
+          levelBadge: cleanLevel,
+          isOnline: params.isOnline,
+          lastActiveAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      } catch (writeErr) {
+        const msg = writeErr instanceof Error ? writeErr.message : String(writeErr);
+        if (msg.includes('permission') || msg.includes('PERMISSION_DENIED')) {
+          const retrySnap = await getServerOrCachedSnap();
+          if (retrySnap.exists()) {
+            const existingData = retrySnap.data();
+            if (existingData?.createdAt && existingData?.studentKey === cleanKey) {
+              await updateDoc(docRef, {
+                displayName: cleanName,
+                levelBadge: cleanLevel,
+                isOnline: params.isOnline,
+                lastActiveAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+              });
+            } else {
+              await setDoc(docRef, {
+                studentKey: cleanKey,
+                displayName: cleanName,
+                levelBadge: cleanLevel,
+                isOnline: params.isOnline,
+                lastActiveAt: serverTimestamp(),
+                createdAt: existingData?.createdAt || serverTimestamp(),
+                updatedAt: serverTimestamp(),
+              });
+            }
+            return cleanKey;
+          }
+        }
+        throw writeErr;
+      }
     } else {
-      await updateDoc(docRef, {
-        displayName: cleanName,
-        levelBadge: cleanLevel,
-        isOnline: params.isOnline,
-        lastActiveAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      const existingData = snap.data();
+      if (existingData?.createdAt && existingData?.studentKey === cleanKey) {
+        await updateDoc(docRef, {
+          displayName: cleanName,
+          levelBadge: cleanLevel,
+          isOnline: params.isOnline,
+          lastActiveAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        await setDoc(docRef, {
+          studentKey: cleanKey,
+          displayName: cleanName,
+          levelBadge: cleanLevel,
+          isOnline: params.isOnline,
+          lastActiveAt: serverTimestamp(),
+          createdAt: existingData?.createdAt || serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
     }
     return cleanKey;
   } catch (error) {
@@ -444,14 +496,36 @@ export async function updateStudentPresenceOnly(studentKey: string, isOnline: bo
   const docRef = doc(db, 'registered_students', cleanKey);
   const path = `registered_students/${cleanKey}`;
   try {
-    const snap = await getDoc(docRef);
+    let snap;
+    try {
+      snap = await getDocFromServer(docRef);
+    } catch {
+      snap = await getDoc(docRef);
+    }
     if (!snap.exists()) return;
+    const existingData = snap.data();
+    if (!existingData?.createdAt || existingData?.studentKey !== cleanKey) {
+      await setDoc(docRef, {
+        studentKey: cleanKey,
+        displayName: String(existingData?.displayName || 'طالب مسجل').slice(0, 80),
+        levelBadge: String(existingData?.levelBadge || 'متعلم ONEFD').slice(0, 40),
+        isOnline,
+        lastActiveAt: serverTimestamp(),
+        createdAt: existingData?.createdAt || serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      return;
+    }
     await updateDoc(docRef, {
       isOnline,
       lastActiveAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes('not-found') || msg.includes('No document to update')) {
+      return;
+    }
     handleFirestoreError(error, OperationType.UPDATE, path);
   }
 }

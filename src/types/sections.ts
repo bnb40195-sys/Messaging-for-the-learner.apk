@@ -2,9 +2,20 @@ export interface AppSectionItem {
   id: string;
   label: string;
   desc: string;
-  targetType: 'view' | 'url';
+  targetType: 'view' | 'url' | 'text';
   targetValue: string;
-  iconName: 'home' | 'book' | 'user' | 'users' | 'file' | 'laptop' | 'globe' | 'star' | 'award';
+  textContent?: string;
+  imageUrl?: string;
+  iconName:
+    | 'home'
+    | 'book'
+    | 'user'
+    | 'users'
+    | 'file'
+    | 'laptop'
+    | 'globe'
+    | 'star'
+    | 'award';
   color: string;
 }
 
@@ -22,11 +33,20 @@ export const DEFAULT_SECTIONS: AppSectionItem[] = [
   {
     id: 'home',
     label: 'الواجهة الرئيسية',
-    desc: 'البوابة العامة والرزنامة والإعلانات',
+    desc: 'البوابة العامة والرزنامة والتنبيهات',
     targetType: 'view',
     targetValue: 'home',
     iconName: 'home',
-    color: 'from-indigo-600 to-purple-600',
+    color: 'from-blue-600 to-sky-600',
+  },
+  {
+    id: 'app-topics',
+    label: 'مواضيع وأسئلة التطبيق',
+    desc: 'بنك المواضيع والأسئلة التفاعلية الحقيقية لجميع المستويات والشعب',
+    targetType: 'view',
+    targetValue: 'app-topics',
+    iconName: 'star',
+    color: 'from-sky-600 to-cyan-600',
   },
   {
     id: 'platforms',
@@ -38,40 +58,13 @@ export const DEFAULT_SECTIONS: AppSectionItem[] = [
     color: 'from-emerald-600 to-teal-600',
   },
   {
-    id: 'app-topics',
-    label: 'مواضيع وأسئلة التطبيق',
-    desc: 'بنك المواضيع والأسئلة التفاعلية الحقيقية لجميع المستويات والشعب',
-    targetType: 'view',
-    targetValue: 'app-topics',
-    iconName: 'star',
-    color: 'from-violet-600 to-purple-600',
-  },
-  {
-    id: 'students',
-    label: 'الطلاب المسجلون',
-    desc: 'قائمة الطلاب النشطين وغير النشطين مع إضافة اسم الطالب',
-    targetType: 'view',
-    targetValue: 'students',
-    iconName: 'users',
-    color: 'from-violet-600 to-indigo-600',
-  },
-  {
-    id: 'registration',
-    label: 'تسجيل الدخول (جديد / سابق)',
-    desc: 'تسجيل متعلم جديد وتأكيد هوية متعلم سابق',
-    targetType: 'view',
-    targetValue: 'registration',
-    iconName: 'user',
-    color: 'from-rose-600 to-pink-600',
-  },
-  {
     id: 'documents',
     label: 'سحب الوثائق',
-    desc: 'إعادة طبع الوثائق، رقم التسجيل، وأي استفسار',
+    desc: 'إعادة طبع الوثائق، رقم التسجيل، تسجيل الدخول (جديد / سابق)، وأي استفسار',
     targetType: 'view',
     targetValue: 'documents',
     iconName: 'file',
-    color: 'from-blue-600 to-cyan-600',
+    color: 'from-amber-600 to-orange-600',
   },
   {
     id: 'homework',
@@ -80,7 +73,7 @@ export const DEFAULT_SECTIONS: AppSectionItem[] = [
     targetType: 'view',
     targetValue: 'homework',
     iconName: 'laptop',
-    color: 'from-sky-600 to-indigo-600',
+    color: 'from-slate-700 to-slate-900',
   },
 ];
 
@@ -88,5 +81,5 @@ export const DEFAULT_HOME_BLOCKS: HomeBlockConfig[] = [
   { id: 'hero', label: 'بطاقة البوابة الترحيبية', visible: true },
   { id: 'countdown', label: 'العد التنازلي للامتحان', visible: true },
   { id: 'calendar', label: 'رزنامة التقويمات التكوينية', visible: true },
-  { id: 'support', label: 'إعلان المرافقة البيداغوجية والنفسية', visible: true },
+  { id: 'support', label: 'المرافقة البيداغوجية والنفسية', visible: true },
 ];

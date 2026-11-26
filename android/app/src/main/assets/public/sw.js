@@ -87,7 +87,7 @@ define(['./workbox-43e44e5a'], (function (workbox) { 'use strict';
     "revision": "9546aaa0250f9e93b8ba75d536c7d8f3"
   }, {
     "url": "index.html",
-    "revision": "2da4ac43c89d606db1b1cb4be2986d83"
+    "revision": "2417a8673284794d6b3c169e601c9809"
   }, {
     "url": "icon.svg",
     "revision": "1cc1fc8e8154c37228102725ae3e6cf0"
@@ -101,121 +101,10 @@ define(['./workbox-43e44e5a'], (function (workbox) { 'use strict';
     "url": "app-logo.png",
     "revision": "c16a0a89a26e6859dd0bc9efc8a2f68a"
   }, {
-    "url": "assets/index-DOkeGhGn.css",
+    "url": "assets/index-Dr0dEiy4.css",
     "revision": null
   }, {
-    "url": "assets/index-C4Km6Qdd.js",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/pedag_psy_d43e3690.jpeg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-34-44-697_com.dirasam.dirasam1_8bcdef16.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-34-39-463_com.dirasam.dirasam1_f4048e70.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-34-00-198_com.dirasam.dirasam1_8999cf57.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-33-54-776_com.dirasam.dirasam1_3c5d1f49.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-33-48-284_com.dirasam.dirasam1_dc0653e5.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-33-41-898_com.dirasam.dirasam1_5870f382.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-33-35-262_com.dirasam.dirasam1_bec0e975.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-33-29-037_com.dirasam.dirasam1_c51e313d.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-32-59-469_com.dirasam.dirasam1_4c5c94e7.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-32-44-820_com.dirasam.dirasam1_c179c714.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-32-38-645_com.dirasam.dirasam1_d6894138.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-32-33-397_com.dirasam.dirasam1_ecfc130b.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-32-27-782_com.dirasam.dirasam1_3e7d027e.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-17-20-31-06-624_com.dirasam.dirasam1_3b4f5357.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-13-16-43-53-270_com.android.chrome_e459e38b.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-12-23-37-56-253_com.dirasam.dirasam1_eb954954.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/Screenshot_2026-11-12-23-37-50-103_com.dirasam.dirasam1_337c274b.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261118_145242_f8ae7aa1.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261117_203055_8713e7ca.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261117_201154_551a08b5.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261116_170513_6f198368.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261116_170414_22a19e2d.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261116_170349_02f0f5d7.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261116_150623_cfaed555.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261116_150511_ef56bd79.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261116_150449_770dcf04.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261115_231400_e070df3b.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261115_000108_b0e8476c.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261115_000039_ef6511d3.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261113_224703_dbaec9c8.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261113_173514_126a6abf.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261113_164420_d29fdcfd.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261113_164254_e8d1485a.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261113_164228_54430fc3.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261113_164159_cc8829ab.jpg",
-    "revision": null
-  }, {
-    "url": "assets/aistudio/IMG_20261112_233154_db1b8818.jpg",
+    "url": "assets/index-DW5ejg0A.js",
     "revision": null
   }, {
     "url": "app-logo.png",
@@ -240,7 +129,7 @@ define(['./workbox-43e44e5a'], (function (workbox) { 'use strict';
     "revision": "3462a6fa87f256348fe5edab36cdddea"
   }, {
     "url": "manifest.webmanifest",
-    "revision": "03a4fb4e3d5d994320e19c1a3882d4b7"
+    "revision": "06bdb588646de0da0bd42d6ec501deb7"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("/index.html"), {

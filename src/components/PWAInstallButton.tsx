@@ -38,8 +38,8 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ compact = fa
           onClick={() => setShowIOSGuide(true)}
           className={
             compact
-              ? 'flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors cursor-pointer'
-              : 'w-full p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer'
+              ? 'flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-sky-300 text-xs font-bold border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors cursor-pointer'
+              : 'w-full p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-blue-800 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer'
           }
           title="طريقة التثبيت على آيفون وآيباد"
         >
@@ -58,27 +58,27 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ compact = fa
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  <Smartphone className="w-5 h-5 text-indigo-600" />
+                  <Smartphone className="w-5 h-5 text-blue-600 dark:text-sky-400" />
                   <span>التثبيت على الآيفون والآيباد</span>
                 </h3>
                 <button
                   onClick={() => setShowIOSGuide(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <p className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-sky-300 font-bold flex items-center justify-center shrink-0">
                     1
                   </span>
                   <span>
-                    اضغط على زر <strong>المشاركة</strong> <Share className="w-3.5 h-3.5 inline text-indigo-600" /> في شريط متصفح Safari.
+                    اضغط على زر <strong>المشاركة</strong> <Share className="w-3.5 h-3.5 inline text-blue-600 dark:text-sky-400" /> في شريط متصفح Safari.
                   </span>
                 </p>
                 <p className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-sky-300 font-bold flex items-center justify-center shrink-0">
                     2
                   </span>
                   <span>
@@ -88,7 +88,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({ compact = fa
               </div>
               <button
                 onClick={() => setShowIOSGuide(false)}
-                className="mt-5 w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 py-2.5 text-xs font-bold text-white"
+                className="mt-5 w-full rounded-xl bg-blue-600 hover:bg-blue-700 py-2.5 text-xs font-bold text-white cursor-pointer"
               >
                 حسناً، فهمت
               </button>
