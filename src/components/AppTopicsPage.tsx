@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronUp,
+  GraduationCap,
   HelpCircle,
   Pencil,
   RefreshCw,
@@ -13,6 +14,11 @@ import {
   Search,
   XCircle,
 } from 'lucide-react';
+import {
+  CORRESPONDENCE_COMBO_OPTIONS,
+  CorrespondenceBranchView,
+  CorrespondenceStep,
+} from './CorrespondenceBranchView';
 import {
   AppSubjectTopic,
   getTopicsForSelection,
@@ -109,6 +115,10 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
     return list;
   }, []);
 
+  const [activeBranch, setActiveBranch] = useState<'bank' | 'correspondence'>('bank');
+  const [corrStep, setCorrStep] = useState<CorrespondenceStep>('select');
+  const [corrSelectedComboKey, setCorrSelectedComboKey] = useState<string>('');
+  const [corrSubjectTitle, setCorrSubjectTitle] = useState<string>('');
   const [step, setStep] = useState<TopicsStep>('select');
   const [selectedComboKey, setSelectedComboKey] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -174,6 +184,18 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
   };
 
   const handleBackNavigation = () => {
+    if (activeBranch === 'correspondence') {
+      if (corrStep === 'topic') {
+        setCorrStep('subjects');
+        return;
+      }
+      if (corrStep === 'subjects') {
+        setCorrStep('select');
+        return;
+      }
+      setActiveBranch('bank');
+      return;
+    }
     if (step === 'topic') {
       setActiveTopic(null);
       setStep('subjects');
@@ -251,6 +273,16 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
   }, [shuffledQuestions, selectedAnswers]);
 
   const headerTitle = useMemo(() => {
+    if (activeBranch === 'correspondence') {
+      if (corrStep === 'subjects') {
+        const found = CORRESPONDENCE_COMBO_OPTIONS.find((c) => c.key === corrSelectedComboKey);
+        return found?.label || 'اختر المادة (المراسلة)';
+      }
+      if (corrStep === 'topic' && corrSubjectTitle) {
+        return corrSubjectTitle;
+      }
+      return 'فرع المراسلة (ONEFD)';
+    }
     if (step === 'select') return 'بنك المواضيع والأسئلة';
     if (step === 'subjects') {
       return selectedCombo?.label || 'اختر المادة';
@@ -259,7 +291,16 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
       return activeTopic.subjectName;
     }
     return t.appTopicsTitle;
-  }, [step, selectedCombo, activeTopic, t.appTopicsTitle]);
+  }, [
+    activeBranch,
+    corrStep,
+    corrSelectedComboKey,
+    corrSubjectTitle,
+    step,
+    selectedCombo,
+    activeTopic,
+    t.appTopicsTitle,
+  ]);
 
   const currentQuestion =
     shuffledQuestions[questionIndex] ? shuffledQuestions[questionIndex] : null;
@@ -284,9 +325,11 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
 
         <div className="text-center min-w-0 flex-1">
           <h1 className="text-base sm:text-xl font-black tracking-tight text-white truncate">
-            {step === 'select' ? editor.sectionHeader.title || headerTitle : headerTitle}
+            {activeBranch === 'bank' && step === 'select'
+              ? editor.sectionHeader.title || headerTitle
+              : headerTitle}
           </h1>
-          {step === 'select' && editor.sectionHeader.subtitle && (
+          {activeBranch === 'bank' && step === 'select' && editor.sectionHeader.subtitle && (
             <p className="text-[11px] text-sky-100 truncate mt-0.5">
               {editor.sectionHeader.subtitle}
             </p>
@@ -296,29 +339,74 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
         <div className="w-11 shrink-0" />
       </div>
 
-      {/* Admin Customization Toolbar */}
-      <div className="flex flex-col items-center">
-        <SectionAdminToolbar
-          isAdmin={editor.isAdmin}
-          isEditMode={editor.isEditMode}
-          hasOverrides={editor.hasOverrides}
-          onToggleEditMode={() => editor.setIsEditMode((v) => !v)}
-          onOpenAddEntry={(type) =>
-            editor.setEntryModal({ isOpen: true, initialType: type, editingEntry: null })
-          }
-          onEditSectionHeader={() => editor.setIsHeaderModalOpen(true)}
-          onResetSectionOverrides={() => customization?.onResetSectionOverrides()}
-        />
+      {/* Top Branch Switcher: Regular Subject Bank vs Official ONEFD Correspondence Branch */}
+      {((activeBranch === 'correspondence' && corrStep === 'select') ||
+        (activeBranch === 'bank' && step === 'select')) && (
+        <div className="rounded-2xl p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs grid grid-cols-2 gap-1.5">
+          <button
+            type="button"
+            onClick={() => setActiveBranch('bank')}
+            className={`min-h-[46px] px-3 py-2 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+              activeBranch === 'bank'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <HelpCircle className="w-4 h-4 shrink-0" />
+            <span>بنك الأسئلة والمواضيع</span>
+          </button>
 
-        {editor.sectionHeader.note && (
-          <div className="w-full max-w-md mb-2 p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800 text-xs text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
-            {editor.sectionHeader.note}
-          </div>
-        )}
-      </div>
+          <button
+            type="button"
+            onClick={() => setActiveBranch('correspondence')}
+            className={`min-h-[46px] px-3 py-2 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+              activeBranch === 'correspondence'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <GraduationCap className="w-4 h-4 shrink-0" />
+            <span>فرع المراسلة (ONEFD)</span>
+          </button>
+        </div>
+      )}
+
+      {/* Correspondence Branch (100% Inside App, Matches Screenshot 3-Step Flow) */}
+      {activeBranch === 'correspondence' && (
+        <CorrespondenceBranchView
+          step={corrStep}
+          selectedComboKey={corrSelectedComboKey}
+          onSelectComboKey={setCorrSelectedComboKey}
+          onChangeStep={setCorrStep}
+          onChangeActiveSubjectTitle={setCorrSubjectTitle}
+        />
+      )}
+
+      {/* Admin Customization Toolbar */}
+      {activeBranch === 'bank' && (
+        <div className="flex flex-col items-center">
+          <SectionAdminToolbar
+            isAdmin={editor.isAdmin}
+            isEditMode={editor.isEditMode}
+            hasOverrides={editor.hasOverrides}
+            onToggleEditMode={() => editor.setIsEditMode((v) => !v)}
+            onOpenAddEntry={(type) =>
+              editor.setEntryModal({ isOpen: true, initialType: type, editingEntry: null })
+            }
+            onEditSectionHeader={() => editor.setIsHeaderModalOpen(true)}
+            onResetSectionOverrides={() => customization?.onResetSectionOverrides()}
+          />
+
+          {editor.sectionHeader.note && (
+            <div className="w-full max-w-md mb-2 p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800 text-xs text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
+              {editor.sectionHeader.note}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* STEP 1: Dropdown Level & Stream Selector + اختيار المادة CTA */}
-      {step === 'select' && (
+      {activeBranch === 'bank' && step === 'select' && (
         <div className="rounded-[2rem] p-6 sm:p-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
           <div className="max-w-lg mx-auto space-y-4">
             {/* Dropdown Trigger Box */}
@@ -393,7 +481,7 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
       )}
 
       {/* STEP 2: Subjects Grid */}
-      {step === 'subjects' && (
+      {activeBranch === 'bank' && step === 'subjects' && (
         <div className="rounded-[2rem] p-5 sm:p-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -480,7 +568,7 @@ export const AppTopicsPage: React.FC<AppTopicsPageProps> = ({
       )}
 
       {/* STEP 3: Question-by-Question Interactive Quiz + Exercises */}
-      {step === 'topic' && activeTopic && (
+      {activeBranch === 'bank' && step === 'topic' && activeTopic && (
         <div className="space-y-4">
           {/* Segmented Mode Tabs */}
           <div className="rounded-2xl p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs grid grid-cols-2 gap-1.5">

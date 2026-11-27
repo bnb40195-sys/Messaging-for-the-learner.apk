@@ -230,17 +230,21 @@ export const AdminEditorPage: React.FC<AdminEditorPageProps> = ({
             defaultUrl: a.externalUrl,
           })),
           {
+            id: 'correspondence-reg',
+            defaultLabel: 'تسجيل المراسلة',
+            defaultSubtitle: 'تسجيل متعلم سابق وتسجيل متعلم جديد',
+            defaultUrl: '',
+          },
+          {
             id: 'old-student',
-            defaultLabel: 'دخول وتأكيد هوية متعلم سابق ↗',
-            defaultSubtitle:
-              'للطلبة المسجلين سابقاً بالديوان الوطني ONEFD: الدخول برقم الاستمارة أو رقم التسجيل وتأكيد الهوية لاستخراج وثائق الموسم الجديد.',
+            defaultLabel: 'تسجيل متعلم سابق',
+            defaultSubtitle: 'inscriptic.onefd.edu.dz · تأكيد الهوية وإعادة التسجيل',
             defaultUrl: 'https://inscriptic.onefd.edu.dz/old-student/verify-identity',
           },
           {
             id: 'new-student',
-            defaultLabel: 'إنشاء حساب وتسجيل جديد ↗',
-            defaultSubtitle:
-              'للراغبين في التسجيل لأول مرة في الطور المتوسط أو الثانوي: إدخال بيانات الحالة المدنية وتوليد استمارة التسجيل وحوالة بريد الجزائر.',
+            defaultLabel: 'تسجيل متعلم جديد',
+            defaultSubtitle: 'inscriptic.onefd.edu.dz · إنشاء حساب وتسجيل لأول مرة',
             defaultUrl: 'https://inscriptic.onefd.edu.dz/new-student/create-account',
           },
         ],

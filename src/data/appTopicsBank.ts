@@ -29,6 +29,7 @@ import {
   TECH_ENG_EXTRA,
 } from './quizQuestionsLangTech';
 import { EXTRA_SUBJECT_EXERCISES } from './extraTopicsExercises';
+import { ONEFD_SUBJECT_BONUS_QUESTIONS } from './onefdCorrespondenceBank';
 
 export type TopicLevelId = '1am' | '2am' | '3am' | '4am' | '1as' | '2as' | '3as';
 
@@ -1651,6 +1652,12 @@ export function getTopicsForSelection(levelId: TopicLevelId, streamId: string): 
       ...baseExercises,
       ...extraExercises.filter((ex) => !baseExercises.some((bEx) => bEx.title === ex.title)),
     ];
+    const baseQuiz = builder.buildQuiz(levelId, streamId);
+    const bonusQuiz = ONEFD_SUBJECT_BONUS_QUESTIONS[key] || [];
+    const mergedQuiz = [
+      ...baseQuiz,
+      ...bonusQuiz.filter((bq) => !baseQuiz.some((q) => q.id === bq.id)),
+    ];
     topics.push({
       id: `${levelId}-${streamId}-${key}`,
       subjectKey: key,
@@ -1660,7 +1667,7 @@ export function getTopicsForSelection(levelId: TopicLevelId, streamId: string): 
       streamId,
       focusSummary: builder.buildSummary(levelId, streamId),
       exercises: mergedExercises,
-      quizQuestions: builder.buildQuiz(levelId, streamId),
+      quizQuestions: mergedQuiz,
     });
   }
 

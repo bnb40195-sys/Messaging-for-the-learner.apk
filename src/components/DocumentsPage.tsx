@@ -9,8 +9,6 @@ import {
   Pencil,
   UserCheck,
   UserPlus,
-  Info,
-  ExternalLink,
 } from 'lucide-react';
 import { DocumentsIllustration } from './Illustrations';
 import { DOCUMENT_ACTIONS, DocumentAction } from '../data/dirasaData';
@@ -42,7 +40,7 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
   customization,
 }) => {
   const editor = useSectionEditor(customization);
-  const [selectedGuide, setSelectedGuide] = useState<'old' | 'new' | null>(null);
+  const [subView, setSubView] = useState<'main' | 'registration'>('main');
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -70,8 +68,22 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
     }
   };
 
+  const regTriggerOv = editor.overrides['correspondence-reg'];
   const oldOv = editor.overrides['old-student'];
   const newOv = editor.overrides['new-student'];
+
+  const handleRegTriggerClick = () => {
+    if (regTriggerOv?.actionType === 'text') {
+      onShowInfo?.(
+        regTriggerOv.textTitle || regTriggerOv.label || 'تسجيل المراسلة',
+        regTriggerOv.textBody || ''
+      );
+    } else if (regTriggerOv?.actionType === 'url' && regTriggerOv.url) {
+      onOpenSite(regTriggerOv.url);
+    } else {
+      setSubView('registration');
+    }
+  };
 
   const handleRegAction = (
     ov: typeof oldOv,
@@ -79,7 +91,7 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
     defaultTitle: string
   ) => {
     if (ov?.actionType === 'text') {
-      onShowInfo?.(ov.textTitle || defaultTitle, ov.textBody || '');
+      onShowInfo?.(ov.textTitle || ov.label || defaultTitle, ov.textBody || '');
     } else if (ov?.actionType === 'url' && ov.url) {
       onOpenSite(ov.url);
     } else {
@@ -87,21 +99,48 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
     }
   };
 
-  const combinedItems = [
-    ...DOCUMENT_ACTIONS.map((action) => ({
-      id: action.id,
-      kind: 'doc' as const,
-      action,
-    })),
-    {
-      id: 'old-student',
-      kind: 'old-student' as const,
-    },
-    {
-      id: 'new-student',
-      kind: 'new-student' as const,
-    },
-  ];
+  const mainButtons = sortItemsByOrder(
+    [
+      ...DOCUMENT_ACTIONS.map((action) => ({
+        id: action.id,
+        kind: 'doc' as const,
+        action,
+      })),
+      {
+        id: 'correspondence-reg',
+        kind: 'correspondence-reg' as const,
+      },
+    ],
+    (item) => item.id,
+    editor.buttonOrder
+  );
+
+  const registrationButtons = sortItemsByOrder(
+    [
+      {
+        id: 'old-student' as const,
+        defaultLabel: 'تسجيل متعلم سابق',
+        defaultSubtitle: 'inscriptic.onefd.edu.dz · تأكيد الهوية وإعادة التسجيل',
+        defaultUrl: OLD_STUDENT_URL,
+      },
+      {
+        id: 'new-student' as const,
+        defaultLabel: 'تسجيل متعلم جديد',
+        defaultSubtitle: 'inscriptic.onefd.edu.dz · إنشاء حساب وتسجيل لأول مرة',
+        defaultUrl: NEW_STUDENT_URL,
+      },
+    ],
+    (item) => item.id,
+    editor.buttonOrder
+  );
+
+  const handleTopBack = () => {
+    if (subView === 'registration') {
+      setSubView('main');
+      return;
+    }
+    onBack();
+  };
 
   return (
     <div className="min-h-full pb-16 flex flex-col items-center">
@@ -109,7 +148,7 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
       <div className="w-full flex items-center justify-between mb-4">
         <button
           type="button"
-          onClick={onBack}
+          onClick={handleTopBack}
           className="flex items-center justify-center w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           title="رجوع"
         >
@@ -118,9 +157,11 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
 
         <div className="text-center">
           <h1 className="text-xl font-black text-slate-900 dark:text-white">
-            {editor.sectionHeader.title || 'سحب الوثائق'}
+            {subView === 'registration'
+              ? regTriggerOv?.label || 'تسجيل المراسلة'
+              : editor.sectionHeader.title || 'سحب الوثائق'}
           </h1>
-          {editor.sectionHeader.subtitle && (
+          {subView === 'main' && editor.sectionHeader.subtitle && (
             <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               {editor.sectionHeader.subtitle}
             </p>
@@ -143,7 +184,7 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
         onResetSectionOverrides={() => customization?.onResetSectionOverrides()}
       />
 
-      {editor.sectionHeader.note && (
+      {subView === 'main' && editor.sectionHeader.note && (
         <div className="w-full max-w-md mb-3 p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800 text-xs text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
           {editor.sectionHeader.note}
         </div>
@@ -154,10 +195,65 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
         <DocumentsIllustration className="w-72 h-48 sm:w-80 sm:h-56" />
       </div>
 
-      {/* Unified Direct Links & Login/Registration Actions */}
-      <div className="w-full max-w-md flex flex-col gap-3.5 mt-4">
-        {sortItemsByOrder(combinedItems, (item) => item.id, editor.buttonOrder).map((item) => {
-          if (item.kind === 'doc') {
+      {/* MAIN VIEW: Documents Pill Buttons + "تسجيل المراسلة" Pill Button */}
+      {subView === 'main' && (
+        <div className="w-full max-w-md flex flex-col gap-3.5 mt-4">
+          {mainButtons.map((item) => {
+            if (item.kind === 'correspondence-reg') {
+              if (regTriggerOv?.hidden && !(editor.isAdmin && editor.isEditMode)) {
+                return null;
+              }
+              const displayTitle = regTriggerOv?.label || 'تسجيل المراسلة';
+              return (
+                <div key="correspondence-reg" className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={handleRegTriggerClick}
+                    className={`w-full min-h-[60px] px-5 py-3 rounded-full bg-white dark:bg-slate-900 hover:bg-blue-50/70 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-base shadow-sm hover:shadow-md flex items-center justify-between transition-all active:scale-[0.98] border border-slate-200 dark:border-slate-800 cursor-pointer ${
+                      regTriggerOv?.hidden ? 'opacity-45' : ''
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                      <ArrowUpRight className="w-4 h-4" />
+                    </div>
+                    <div className="text-center px-2 min-w-0">
+                      <span className="text-base tracking-wide block truncate">
+                        {displayTitle}
+                      </span>
+                      {regTriggerOv?.subtitle && (
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                          {regTriggerOv.subtitle}
+                        </span>
+                      )}
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                      <UserCheck className="w-5 h-5" />
+                    </div>
+                  </button>
+
+                  {editor.isAdmin && editor.isEditMode && (
+                    <div className="flex justify-end px-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          editor.setEditingButton({
+                            id: 'correspondence-reg',
+                            defaultLabel: 'تسجيل المراسلة',
+                            defaultSubtitle: 'تسجيل متعلم سابق وتسجيل متعلم جديد',
+                            defaultUrl: '',
+                          })
+                        }
+                        className="px-3 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-sky-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        <span>تعديل هذا الزر</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const action = item.action;
             const ov = editor.overrides[action.id];
             if (ov?.hidden && !(editor.isAdmin && editor.isEditMode)) {
@@ -213,69 +309,65 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
                 )}
               </div>
             );
-          }
+          })}
+        </div>
+      )}
 
-          if (item.kind === 'old-student') {
-            if (oldOv?.hidden && !(editor.isAdmin && editor.isEditMode)) return null;
+      {/* SUB-VIEW: Inside "تسجيل المراسلة" (Old Student + New Student Buttons with Official Websites) */}
+      {subView === 'registration' && (
+        <div className="w-full max-w-md flex flex-col gap-3.5 mt-4 animate-fadeIn">
+          {registrationButtons.map((btn) => {
+            const ov = btn.id === 'old-student' ? oldOv : newOv;
+            if (ov?.hidden && !(editor.isAdmin && editor.isEditMode)) {
+              return null;
+            }
+            const displayLabel = ov?.label || btn.defaultLabel;
+            const displaySub = ov?.subtitle || btn.defaultSubtitle;
+            const isOld = btn.id === 'old-student';
+
             return (
-              <div
-                key="old-student"
-                className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow ${
-                  oldOv?.hidden ? 'opacity-45' : ''
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-sky-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-600/20 shrink-0">
-                      <UserCheck className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold text-blue-700 dark:text-sky-300 block">
-                        متعلم سابق · إعادة التسجيل
-                      </span>
-                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
-                        {oldOv?.label || 'تسجيل الدخول لمتعلم سابق (تأكيد الهوية)'}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedGuide('old')}
-                    className="w-9 h-9 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-sky-300 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-slate-700 shrink-0 cursor-pointer"
-                    title="دليل إعادة التسجيل"
-                  >
-                    <Info className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <p className="text-xs text-slate-600 dark:text-slate-300 mb-3 leading-relaxed">
-                  {oldOv?.subtitle ||
-                    'للطلبة المسجلين سابقاً بالديوان الوطني ONEFD: الدخول برقم الاستمارة أو رقم التسجيل وتأكيد الهوية لاستخراج وثائق الموسم الجديد.'}
-                </p>
-
+              <div key={btn.id} className="space-y-1">
                 <button
                   type="button"
-                  onClick={() =>
-                    handleRegAction(oldOv, OLD_STUDENT_URL, 'دخول وتأكيد هوية متعلم سابق')
-                  }
-                  className="w-full h-11 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md flex items-center justify-center gap-2 transition-transform active:scale-[0.98] cursor-pointer"
+                  onClick={() => handleRegAction(ov, btn.defaultUrl, btn.defaultLabel)}
+                  className={`w-full min-h-[60px] px-5 py-3 rounded-full bg-white dark:bg-slate-900 hover:bg-blue-50/70 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-base shadow-sm hover:shadow-md flex items-center justify-between transition-all active:scale-[0.98] border border-slate-200 dark:border-slate-800 cursor-pointer ${
+                    ov?.hidden ? 'opacity-45' : ''
+                  }`}
                 >
-                  <span>{oldOv?.label || 'دخول وتأكيد هوية متعلم سابق ↗'}</span>
-                  <ArrowUpRight className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <ArrowUpRight className="w-4 h-4" />
+                  </div>
+                  <div className="text-center px-2 min-w-0">
+                    <span className="text-base tracking-wide block truncate">{displayLabel}</span>
+                    {displaySub && (
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
+                        {displaySub}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className={`w-10 h-10 rounded-full text-white flex items-center justify-center shadow-sm shrink-0 ${
+                      isOld ? 'bg-blue-600' : 'bg-emerald-600'
+                    }`}
+                  >
+                    {isOld ? (
+                      <UserCheck className="w-5 h-5" />
+                    ) : (
+                      <UserPlus className="w-5 h-5" />
+                    )}
+                  </div>
                 </button>
 
                 {editor.isAdmin && editor.isEditMode && (
-                  <div className="flex justify-end mt-2">
+                  <div className="flex justify-end px-2">
                     <button
                       type="button"
                       onClick={() =>
                         editor.setEditingButton({
-                          id: 'old-student',
-                          defaultLabel: 'دخول وتأكيد هوية متعلم سابق ↗',
-                          defaultSubtitle:
-                            'للطلبة المسجلين سابقاً بالديوان الوطني ONEFD: الدخول برقم الاستمارة أو رقم التسجيل وتأكيد الهوية لاستخراج وثائق الموسم الجديد.',
-                          defaultUrl: OLD_STUDENT_URL,
+                          id: btn.id,
+                          defaultLabel: btn.defaultLabel,
+                          defaultSubtitle: btn.defaultSubtitle,
+                          defaultUrl: btn.defaultUrl,
                         })
                       }
                       className="px-3 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-sky-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
@@ -287,165 +379,30 @@ export const DocumentsPage: React.FC<DocumentsPageProps> = ({
                 )}
               </div>
             );
-          }
-
-          if (newOv?.hidden && !(editor.isAdmin && editor.isEditMode)) return null;
-          return (
-            <div
-              key="new-student"
-              className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow ${
-                newOv?.hidden ? 'opacity-45' : ''
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-600/20 shrink-0">
-                    <UserPlus className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 block">
-                      متعلم جديد · لأول مرة
-                    </span>
-                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
-                      {newOv?.label || 'إنشاء حساب وتسجيل متعلم جديد'}
-                    </h3>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedGuide('new')}
-                  className="w-9 h-9 rounded-full bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-300 flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-slate-700 shrink-0 cursor-pointer"
-                  title="دليل التسجيل والشروط"
-                >
-                  <Info className="w-4 h-4" />
-                </button>
-              </div>
-
-              <p className="text-xs text-slate-600 dark:text-slate-300 mb-3 leading-relaxed">
-                {newOv?.subtitle ||
-                  'للراغبين في التسجيل لأول مرة في الطور المتوسط أو الثانوي: إدخال بيانات الحالة المدنية وتوليد استمارة التسجيل وحوالة بريد الجزائر.'}
-              </p>
-
-              <button
-                type="button"
-                onClick={() =>
-                  handleRegAction(newOv, NEW_STUDENT_URL, 'إنشاء حساب وتسجيل جديد')
-                }
-                className="w-full h-11 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md flex items-center justify-center gap-2 transition-transform active:scale-[0.98] cursor-pointer"
-              >
-                <span>{newOv?.label || 'إنشاء حساب وتسجيل جديد ↗'}</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
-
-              {editor.isAdmin && editor.isEditMode && (
-                <div className="flex justify-end mt-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      editor.setEditingButton({
-                        id: 'new-student',
-                        defaultLabel: 'إنشاء حساب وتسجيل جديد ↗',
-                        defaultSubtitle:
-                          'للراغبين في التسجيل لأول مرة في الطور المتوسط أو الثانوي: إدخال بيانات الحالة المدنية وتوليد استمارة التسجيل وحوالة بريد الجزائر.',
-                        defaultUrl: NEW_STUDENT_URL,
-                      })
-                    }
-                    className="px-3 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-sky-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
-                  >
-                    <Pencil className="w-3 h-3" />
-                    <span>تعديل هذا الزر</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+          })}
+        </div>
+      )}
 
       {/* Custom Websites & Texts Added to This Section */}
-      <SectionCustomEntriesList
-        entries={editor.entries}
-        isAdmin={editor.isAdmin}
-        isEditMode={editor.isEditMode}
-        onOpenSite={onOpenSite}
-        onShowInfo={onShowInfo}
-        onEditEntry={(entry) =>
-          editor.setEntryModal({ isOpen: true, initialType: entry.type, editingEntry: entry })
-        }
-        onDeleteEntry={(id) => customization?.onDeleteCustomEntry(id)}
-        onMoveEntry={(id, dir) => customization?.onMoveCustomEntry(id, dir)}
-      />
-
-      {/* Guide Modals for Old / New Student Registration */}
-      {selectedGuide && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-sky-400 flex items-center justify-center">
-                  {selectedGuide === 'new' ? (
-                    <UserPlus className="w-5 h-5" />
-                  ) : (
-                    <UserCheck className="w-5 h-5" />
-                  )}
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    {selectedGuide === 'new'
-                      ? 'إجراءات تسجيل متعلم جديد 2026/2027'
-                      : 'إجراءات إعادة تسجيل متعلم سابق 2026/2027'}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    الديوان الوطني للتعليم والتكوين عن بعد (ONEFD)
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedGuide(null)}
-                className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center text-sm font-bold cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-slate-950 border border-blue-100 dark:border-slate-800 space-y-1.5">
-                <span className="font-bold text-blue-700 dark:text-sky-300 block">
-                  الملف المطلوب:
-                </span>
-                <ul className="text-slate-600 dark:text-slate-300 space-y-1 list-disc list-inside">
-                  <li>استمارة التسجيل الإلكترونية مستخرجة من الموقع الرسمي.</li>
-                  <li>وصل دفع حقوق التسجيل المسلم من بريد الجزائر (حوالة بريدية).</li>
-                  <li>شهادة ميلاد أصلية حديثة (للمتعلم الجديد).</li>
-                  <li>كشف نقاط المستوى الدراسي الأخير أو شهادة مدرسية أصلية.</li>
-                  <li>صورتان شمسيتان حديثتان وظرفان بريديان عليهما طابع وعنوان الإقامة.</li>
-                </ul>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  const targetUrl =
-                    selectedGuide === 'new' ? NEW_STUDENT_URL : OLD_STUDENT_URL;
-                  setSelectedGuide(null);
-                  onOpenSite(targetUrl);
-                }}
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-sky-600 hover:opacity-95 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>زيارة الموقع الرسمي ↗</span>
-                <ExternalLink className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+      {subView === 'main' && (
+        <SectionCustomEntriesList
+          entries={editor.entries}
+          isAdmin={editor.isAdmin}
+          isEditMode={editor.isEditMode}
+          onOpenSite={onOpenSite}
+          onShowInfo={onShowInfo}
+          onEditEntry={(entry) =>
+            editor.setEntryModal({ isOpen: true, initialType: entry.type, editingEntry: entry })
+          }
+          onDeleteEntry={(id) => customization?.onDeleteCustomEntry(id)}
+          onMoveEntry={(id, dir) => customization?.onMoveCustomEntry(id, dir)}
+        />
       )}
 
       {/* Footer Notice */}
       <div className="mt-auto pt-8 text-center">
         <p className="text-xs text-slate-600 dark:text-slate-400">
-          بالضغط على أي خدمة أو خيار تسجيل يتم فتح الموقع الرسمي للديوان الوطني مباشرة في المتصفح
+          بالضغط على أي زر يتم توجيهك مباشرة إلى الموقع الرسمي للديوان الوطني للتعليم والتكوين عن بعد
         </p>
       </div>
 
