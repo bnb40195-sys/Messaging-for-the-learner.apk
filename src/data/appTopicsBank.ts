@@ -29,6 +29,7 @@ import {
   TECH_ENG_EXTRA,
 } from './quizQuestionsLangTech';
 import { EXTRA_SUBJECT_EXERCISES } from './extraTopicsExercises';
+import { EXTRA_QUIZ_POOLS } from './extraQuizPools';
 import { ONEFD_SUBJECT_BONUS_QUESTIONS } from './onefdCorrespondenceBank';
 
 export type TopicLevelId = '1am' | '2am' | '3am' | '4am' | '1as' | '2as' | '3as';
@@ -129,6 +130,7 @@ export interface PracticeExercise {
   pointsLabel: string;
   tasks: string[];
   solutionSteps: string[];
+  topicQuestions?: RealQuizQuestion[];
 }
 
 export interface RealQuizQuestion {
@@ -1639,6 +1641,18 @@ export function getSubjectsForTopicSelection(level: TopicLevelId, streamId: stri
   ];
 }
 
+function buildTopicQuestionsSlice(
+  pool: RealQuizQuestion[],
+  topicIdx: number,
+  targetCount = 20
+): RealQuizQuestion[] {
+  if (pool.length === 0) return [];
+  const count = Math.min(targetCount, pool.length);
+  const offset = (topicIdx * 7) % pool.length;
+  const rotated = [...pool.slice(offset), ...pool.slice(0, offset)];
+  return rotated.slice(0, count);
+}
+
 export function getTopicsForSelection(levelId: TopicLevelId, streamId: string): AppSubjectTopic[] {
   const keys = getSubjectsForTopicSelection(levelId, streamId);
   const topics: AppSubjectTopic[] = [];
@@ -1648,16 +1662,31 @@ export function getTopicsForSelection(levelId: TopicLevelId, streamId: string): 
     if (!builder) continue;
     const baseExercises = builder.buildExercises(levelId, streamId);
     const extraExercises = EXTRA_SUBJECT_EXERCISES[key] || [];
-    const mergedExercises = [
+    const mergedRawExercises = [
       ...baseExercises,
       ...extraExercises.filter((ex) => !baseExercises.some((bEx) => bEx.title === ex.title)),
     ];
+
     const baseQuiz = builder.buildQuiz(levelId, streamId);
     const bonusQuiz = ONEFD_SUBJECT_BONUS_QUESTIONS[key] || [];
-    const mergedQuiz = [
-      ...baseQuiz,
-      ...bonusQuiz.filter((bq) => !baseQuiz.some((q) => q.id === bq.id)),
-    ];
+    const poolQuiz = EXTRA_QUIZ_POOLS[key] || [];
+
+    const seenIds = new Set<string>();
+    const seenPrompts = new Set<string>();
+    const mergedQuiz: RealQuizQuestion[] = [];
+    for (const q of [...baseQuiz, ...poolQuiz, ...bonusQuiz]) {
+      const normPrompt = q.prompt.trim();
+      if (seenIds.has(q.id) || seenPrompts.has(normPrompt)) continue;
+      seenIds.add(q.id);
+      seenPrompts.add(normPrompt);
+      mergedQuiz.push(q);
+    }
+
+    const mergedExercises: PracticeExercise[] = mergedRawExercises.map((ex, exIdx) => ({
+      ...ex,
+      topicQuestions: buildTopicQuestionsSlice(mergedQuiz, exIdx, 20),
+    }));
+
     topics.push({
       id: `${levelId}-${streamId}-${key}`,
       subjectKey: key,
